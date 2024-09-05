@@ -17,6 +17,11 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('role');
+            $table->foreignId('utusan_id')->nullable()->constrained(
+                table: 'utusans',
+                indexName: 'users_utusan_id',
+            );
             $table->rememberToken();
             $table->timestamps();
         });

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "68c4c64a84d87d601f08a162e8e878ac",
+    "content-hash": "4cd6f183776df4372a6e550aa0d3f7b8",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -2021,6 +2021,77 @@
             "time": "2024-06-26T13:09:29+00:00"
         },
         {
+            "name": "laravel-frontend-presets/tall",
+            "version": "v8.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/laravel-frontend-presets/tall.git",
+                "reference": "d79213d3a5c8a732ab54fe191b596b868d0edb20"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/laravel-frontend-presets/tall/zipball/d79213d3a5c8a732ab54fe191b596b868d0edb20",
+                "reference": "d79213d3a5c8a732ab54fe191b596b868d0edb20",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "^11.0",
+                "laravel/ui": "^4.5",
+                "php": "^8.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^10.5"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "LaravelFrontendPresets\\Tall\\TallServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "LaravelFrontendPresets\\Tall\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Dan Harrin",
+                    "email": "Dan@DanHarrin.com"
+                },
+                {
+                    "name": "Liam Hammett",
+                    "email": "liam@liamhammett.com"
+                },
+                {
+                    "name": "Ryan Chandler",
+                    "email": "support@ryangjchandler.co.uk"
+                }
+            ],
+            "description": "TALL preset for Laravel.",
+            "keywords": [
+                "alpine",
+                "alpinejs",
+                "laravel",
+                "livewire",
+                "preset",
+                "tailwind",
+                "tailwindcss",
+                "tailwindui",
+                "tall"
+            ],
+            "support": {
+                "issues": "https://github.com/laravel-frontend-presets/tall/issues",
+                "source": "https://github.com/laravel-frontend-presets/tall"
+            },
+            "time": "2024-03-28T20:14:59+00:00"
+        },
+        {
             "name": "laravel/framework",
             "version": "v11.21.0",
             "source": {
@@ -2410,6 +2481,69 @@
                 "source": "https://github.com/laravel/tinker/tree/v2.9.0"
             },
             "time": "2024-01-04T16:10:04+00:00"
+        },
+        {
+            "name": "laravel/ui",
+            "version": "v4.5.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/laravel/ui.git",
+                "reference": "c75396f63268c95b053c8e4814eb70e0875e9628"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/laravel/ui/zipball/c75396f63268c95b053c8e4814eb70e0875e9628",
+                "reference": "c75396f63268c95b053c8e4814eb70e0875e9628",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/console": "^9.21|^10.0|^11.0",
+                "illuminate/filesystem": "^9.21|^10.0|^11.0",
+                "illuminate/support": "^9.21|^10.0|^11.0",
+                "illuminate/validation": "^9.21|^10.0|^11.0",
+                "php": "^8.0",
+                "symfony/console": "^6.0|^7.0"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^7.35|^8.15|^9.0",
+                "phpunit/phpunit": "^9.3|^10.4|^11.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "4.x-dev"
+                },
+                "laravel": {
+                    "providers": [
+                        "Laravel\\Ui\\UiServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Laravel\\Ui\\": "src/",
+                    "Illuminate\\Foundation\\Auth\\": "auth-backend/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Taylor Otwell",
+                    "email": "taylor@laravel.com"
+                }
+            ],
+            "description": "Laravel UI utilities and presets.",
+            "keywords": [
+                "laravel",
+                "ui"
+            ],
+            "support": {
+                "source": "https://github.com/laravel/ui/tree/v4.5.2"
+            },
+            "time": "2024-05-08T18:07:10+00:00"
         },
         {
             "name": "league/commonmark",
@@ -4881,6 +5015,88 @@
                 }
             ],
             "time": "2024-03-20T07:29:11+00:00"
+        },
+        {
+            "name": "spatie/laravel-permission",
+            "version": "6.9.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/spatie/laravel-permission.git",
+                "reference": "fe973a58b44380d0e8620107259b7bda22f70408"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/fe973a58b44380d0e8620107259b7bda22f70408",
+                "reference": "fe973a58b44380d0e8620107259b7bda22f70408",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/auth": "^8.12|^9.0|^10.0|^11.0",
+                "illuminate/container": "^8.12|^9.0|^10.0|^11.0",
+                "illuminate/contracts": "^8.12|^9.0|^10.0|^11.0",
+                "illuminate/database": "^8.12|^9.0|^10.0|^11.0",
+                "php": "^8.0"
+            },
+            "require-dev": {
+                "laravel/passport": "^11.0|^12.0",
+                "orchestra/testbench": "^6.23|^7.0|^8.0|^9.0",
+                "phpunit/phpunit": "^9.4|^10.1"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-main": "6.x-dev",
+                    "dev-master": "6.x-dev"
+                },
+                "laravel": {
+                    "providers": [
+                        "Spatie\\Permission\\PermissionServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "files": [
+                    "src/helpers.php"
+                ],
+                "psr-4": {
+                    "Spatie\\Permission\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Freek Van der Herten",
+                    "email": "freek@spatie.be",
+                    "homepage": "https://spatie.be",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Permission handling for Laravel 8.0 and up",
+            "homepage": "https://github.com/spatie/laravel-permission",
+            "keywords": [
+                "acl",
+                "laravel",
+                "permission",
+                "permissions",
+                "rbac",
+                "roles",
+                "security",
+                "spatie"
+            ],
+            "support": {
+                "issues": "https://github.com/spatie/laravel-permission/issues",
+                "source": "https://github.com/spatie/laravel-permission/tree/6.9.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/spatie",
+                    "type": "github"
+                }
+            ],
+            "time": "2024-06-22T23:04:52+00:00"
         },
         {
             "name": "symfony/clock",
@@ -9671,5 +9887,5 @@
         "php": "^8.2"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.3.0"
+    "plugin-api-version": "2.6.0"
 }

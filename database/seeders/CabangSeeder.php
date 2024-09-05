@@ -30,14 +30,14 @@ class CabangSeeder extends Seeder
         Cabang::create([
             'nama_cabang' => 'Tilawah Anak-anak Putra',
             'gender_cabang' => 'putra',
-            'batas_umur' => '12 Tahun 11 Bulan 29 Hari',
+            'batas_umur' => '12 tahun 11 bulan 29 hari',
             'per_tanggal' => '01-07-2024',
         ]);
 
         Cabang::create([
             'nama_cabang' => 'Tilawah Anak-anak Putri',
             'gender_cabang' => 'putri',
-            'batas_umur' => '12 Tahun 11 Bulan 29 Hari',
+            'batas_umur' => '12 tahun 11 bulan 29 hari',
             'per_tanggal' => '01-07-2024',
         ]);
 

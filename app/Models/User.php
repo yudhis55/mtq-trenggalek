@@ -8,10 +8,15 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
+use Filament\Panel\Concerns\HasAvatars;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasRoles, HasAvatars;
 
     /**
      * The attributes that are mass assignable.
@@ -47,8 +52,29 @@ class User extends Authenticatable
         ];
     }
 
-    // public function canAccessPanel(Panel $panel): bool
-    // {
-    //     return str_ends_with($this->email, '@google.com') && $this->hasVerifiedEmail();
-    // }
+    public function peserta(): HasMany
+    {
+        return $this->hasMany(Peserta::class);
+    }
+
+    public function utusan(): HasOne
+    {
+        return $this->hasOne(Utusan::class);
+    }
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        if ($panel->getId() === 'admin') {
+            return str_ends_with($this->email, '@admin.com');
+        }
+        if ($panel->getId() === 'kecamatan') {
+            return str_ends_with($this->email, '@mtq.com');
+        }
+        return false;
+    }
+
+    public function getFilamentAvatarUrl(): ?string
+    {
+        return $this->asset('images/logotgx.png');
+    }
 }

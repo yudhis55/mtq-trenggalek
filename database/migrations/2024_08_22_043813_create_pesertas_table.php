@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('tempat_lahir');
             $table->date('tgl_lahir');
             $table->string('alamat_ktp');
+            $table->string('alamat_domisili');
             $table->foreignId('utusan_id')->constrained(
                 table: 'utusans',
                 indexName: 'pesertas_utusan_id'
@@ -28,11 +29,19 @@ return new class extends Migration
                 indexName: 'pesertas_cabang_id'
             )->cascadeOnDelete();
             $table->string('kk_ktp');
-            $table->string('akta');
-            $table->string('ijazah');
-            $table->string('piagam');
+            // $table->string('akta');
+            // $table->string('ijazah');
+            // $table->string('piagam');
             $table->string('pasfoto');
             $table->boolean('is_verified')->default(false);
+            $table->foreignId('user_id')->constrained(
+                table: 'users',
+                indexName: 'pesertas_user_id'
+            );
+            $table->foreignId('tahun_id')->constrained(
+                table: 'tahuns',
+                indexName: 'pesertas_tahun_id'
+            );
             $table->timestamps();
         });
     }

@@ -19,17 +19,29 @@ use App\Models\Cabang;
 use Filament\Forms\Get;
 use Illuminate\Validation\ValidationException;
 use Carbon\Carbon;
+use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Illuminate\Support\HtmlString;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use PhpParser\Node\Stmt\Label;
+use Illuminate\Support\Facades\Auth;
+use Filament\Forms\Components\Hidden;
+use Filament\Infolists\Components\ImageEntry;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Tables\Columns\ToggleColumn;
+use Filament\Infolists\Infolist;
+use Filament\Infolists\Components\Actions\Action;
+use Filament\Infolists\Components\Section;
+use Filament\Tables\Filters\QueryBuilder\Constraints\TextConstraint;
+use App\Models\Tahun;
+use Illuminate\Support\Str;
 
 class PesertaResource extends Resource
 {
     protected static ?string $model = Peserta::class;
 
-    protected static ?string $navigationIcon = 'heroicon-s-user-group';
+    protected static ?string $navigationIcon = 'heroicon-o-user-group';
 
     protected static ?string $navigationLabel = 'Peserta';
 
@@ -42,6 +54,32 @@ class PesertaResource extends Resource
     {
         return $form
             ->schema([
+                Forms\Components\TextInput::make('nik')
+                    ->label(__('NIK'))
+                    ->unique()
+                    ->required()
+                    ->numeric()
+                    ->length(16)
+                    ->live()
+                    // ->unique(column: 'nik')
+                    ->validationMessages([
+                        'required' => 'Kolom NIK tidak boleh kosong',
+                        'unique' => 'NIK sudah pernah didaftarkan.',
+                    ])
+                    ->afterStateUpdated(function ($state, $set, $get) {
+                        $pesertaExists = Peserta::where('nik', $state)->exists();
+
+                        if (!$pesertaExists && strlen($state) == 16) {
+                            // NIK valid, lakukan tindakan lain jika diperlukan
+                        } else {
+                            // NIK tidak valid, kosongkan field
+                            // $set('nik', null);
+                            Notification::make()
+                                ->title(__('NIK tidak valid atau sudah terdaftar.'))
+                                ->danger()
+                                ->send();
+                        }
+                    }),
                 Forms\Components\TextInput::make('nama')
                     ->label(__('Nama Lengkap'))
                     ->required()
@@ -64,16 +102,6 @@ class PesertaResource extends Resource
                     ->afterStateUpdated(function ($state, $get, $set) {
                         $set('cabang_id', null);
                     }),
-                Forms\Components\TextInput::make('nik')
-                    ->label(__('NIK'))
-                    ->required()
-                    ->numeric()
-                    ->length(16)
-                    ->unique(column: 'nik')
-                    ->validationMessages([
-                        'required' => 'Kolom NIK tidak boleh kosong',
-                        'unique' => 'NIK sudah pernah didaftarkan.',
-                    ]),
                 Forms\Components\TextInput::make('tempat_lahir')
                     ->label(__('Tempat Lahir'))
                     ->required()
@@ -103,23 +131,63 @@ class PesertaResource extends Resource
                     ->validationMessages([
                         'required' => 'Kolom Alamat KTP tidak boleh kosong',
                     ]),
+                Forms\Components\Textarea::make('alamat_domisili')
+                    ->label(__('Alamat Domisili'))
+                    ->required()
+                    ->maxLength(500)
+                    ->validationMessages([
+                        'required' => 'Kolom Alamat KTP tidak boleh kosong',
+                    ]),
                 Forms\Components\Select::make('utusan_id')
                     ->label(__('Utusan Kecamatan'))
                     ->required()
                     ->relationship('utusan', 'kecamatan')
                     ->native(false)
+                    ->live() // Menambahkan live update
+                    ->afterStateUpdated(function ($state, $set, $get) {
+                        $set('cabang_id', null); // Kosongkan field cabang_id saat utusan_id berubah
+                    })
                     ->validationMessages([
                         'required' => 'Kolom Utusan Kecamatan tidak boleh kosong',
                     ]),
                 Forms\Components\Select::make('cabang_id')
-                    ->required(fn(Get $get): bool => filled($get('tgl_lahir')))
+                    ->required()
                     ->label(__('Cabang yang Diikuti'))
+                    ->preload()
+                    ->relationship('cabang', 'nama_cabang')
                     ->required()
                     ->live()
-                    // ->relationship('cabang', 'nama_cabang')
-                    ->options(fn(Get $get): Collection => Cabang::query()
-                        ->where('gender_cabang', $get('jenis_kelamin'))
-                        ->pluck('nama_cabang', 'id'))
+                    ->options(function (Get $get) {
+                        $utusanId = $get('utusan_id');
+                        $jenisKelamin = $get('jenis_kelamin');
+
+                        if (!$utusanId || !$jenisKelamin) {
+                            return [];
+                        }
+
+                        // Kuota cabang
+                        $cabangKuota = [
+                            'MFQ Putra' => 3,
+                            'MFQ Putri' => 3,
+                            'MSQ Putra' => 3,
+                            'MSQ Putri' => 3,
+                        ];
+
+                        $selectedCabangKuota = 1;
+
+                        return Cabang::query()
+                            ->where('gender_cabang', $jenisKelamin)
+                            ->get()
+                            ->filter(function ($cabang) use ($utusanId, $cabangKuota, $selectedCabangKuota) {
+                                $kuota = $cabangKuota[$cabang->nama_cabang] ?? $selectedCabangKuota;
+                                $jumlahPeserta = Peserta::where('utusan_id', $utusanId)
+                                    ->where('cabang_id', $cabang->id)
+                                    ->count();
+
+                                return $jumlahPeserta < $kuota;
+                            })
+                            ->pluck('nama_cabang', 'id');
+                    })
                     ->native(false)
                     ->afterStateUpdated(function ($state, $get, $set) {
                         $birthdate = $get('tgl_lahir');
@@ -146,7 +214,7 @@ class PesertaResource extends Resource
                                 ->subDays($batasUmur['days']);
                             $maxAgeInDays = $maxAgeDate->diffInDays($perTanggal);
 
-                            if ($ageInDays > $maxAgeInDays) {
+                            if ($ageInDays > $maxAgeInDays + 1) {
                                 $set('cabang_id', null);
                                 Notification::make()
                                     ->title(__('Usia peserta melebihi batas maksimal untuk cabang ini.'))
@@ -168,8 +236,28 @@ class PesertaResource extends Resource
                     ->validationMessages([
                         'required' => 'File KK / KTP belum diunggah',
                     ])
-                    ->helperText(new HtmlString('<strong>Petunjuk :</strong> Unggah foto berukuran maksimal 512kb.'))
+                    ->helperText(new HtmlString('<strong>Petunjuk :</strong> Unggah foto KK/KTP berukuran maksimal 512kb.'))
                     ->moveFiles(),
+                FileUpload::make('pasfoto')
+                    ->label(__('Pas Foto'))
+                    ->required()
+                    ->image()
+                    ->openable()
+                    ->maxSize(512)
+                    ->validationMessages([
+                        'required' => 'File Pas Foto belum diunggah',
+                    ])
+                    ->moveFiles()
+                    ->imageEditor()
+                    ->helperText(new HtmlString('<strong>Petunjuk :</strong> Unggah pas foto berukuran maksimal 512kb.')),
+                Hidden::make('user_id')
+                    ->default(Auth::id()),
+                Hidden::make('tahun_id')
+                    ->default(function () {
+                        // Mengambil id tahun yang is_active bernilai true
+                        $tahun = Tahun::where('is_active', true)->first();
+                        return $tahun ? $tahun->id : null;
+                    }),
                 // FileUpload::make('akta')
                 //     ->label(__('Akta Kelahiran'))
                 //     ->required()
@@ -200,16 +288,6 @@ class PesertaResource extends Resource
                 //         'required' => 'File Piagam belum diunggah',
                 //     ])
                 //     ->moveFiles(),
-                // FileUpload::make('pasfoto')
-                //     ->label(__('Pas Foto'))
-                //     ->required()
-                //     ->image()
-                //     ->openable()
-                //     ->maxSize(512)
-                //     ->validationMessages([
-                //         'required' => 'File Pas Foto belum diunggah',
-                //     ])
-                //     ->moveFiles(),
             ])
             ->columns(2);
     }
@@ -220,23 +298,139 @@ class PesertaResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('nama')
                     ->limit(15)
-                    ->label(__('Nama')),
+                    ->label(__('Nama'))
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('jenis_kelamin')
+                    ->label(__('L/P')),
                 Tables\Columns\TextColumn::make('tempat_lahir')
-                    ->label(__('Tempat Lahir')),
+                    ->label(__('Tempat Lahir'))
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('tgl_lahir')
                     ->label(__('Tgl Lahir')),
                 Tables\Columns\TextColumn::make('alamat_ktp')
                     ->limit(20)
                     ->label(__('Alamat KTP')),
                 Tables\Columns\TextColumn::make('utusan.kecamatan')
-                    ->label(__('Utusan')),
+                    ->label(__('Utusan'))
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('cabang.nama_cabang')
-                    ->label(__('Cabang')),
+                    ->label(__('Cabang'))
+                    ->searchable(),
+                ToggleColumn::make('is_verified')
+                    ->label(__('Verifikasi')),
+                Tables\Columns\TextColumn::make('tahun.tahun')
             ])
             ->filters([
                 SelectFilter::make('utusan.kecamatan')
                     ->relationship('utusan', 'kecamatan')
-                    ->label(__('Kecamatan'))
+                    ->label(__(' Bace Kecamatan'))
+                    ->native(false),
+                SelectFilter::make('cabang_merged')
+                    ->label('Bace Cabang')
+                    ->options([
+                        'tartil' => 'Tartil',
+                        'tilawah anak-anak' => 'Tilawah Anak-anak',
+                        'tilawah remaja' => 'Tilawah Remaja',
+                        'tilawah dewasa' => 'Tilawah Dewasa',
+                        'mhq 1 juz dan tilawah' => 'MHQ 1 juz dan Tilawah',
+                        'mhq 5 juz dan tilawah' => 'MHQ 5 juz dan Tilawah',
+                        'mhq 10 juz' => 'MHQ 10 juz',
+                        'mhq 20 juz' => 'MHQ 20 juz',
+                        'mhq 30 juz' => 'MHQ 30 juz',
+                        'mfq' => 'MFQ',
+                        'msq' => 'MSQ',
+                        'mkq naskah' => 'MKQ Naskah',
+                        'mkq hiasan mushaf' => 'MKQ Hiasan Mushaf',
+                        'mkq dekorasi' => 'MKQ Dekorasi',
+                        'mkq kontemporer' => 'MKQ Kontemporer',
+                        'mmq' => 'MMQ',
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        $value = $data['value'] ?? null;
+
+                        if ($value === 'tartil') {
+                            // Filter peserta dengan cabang Tartil Putra atau Tartil Putri
+                            return $query->whereHas('cabang', function (Builder $query) {
+                                $query->where('nama_cabang', 'like', '%Tartil%');
+                            });
+                        } elseif ($value === 'tilawah anak-anak') {
+                            // Filter peserta dengan cabang Tilawah Anak-anak Putra atau Tilawah Anak-anak Putri
+                            return $query->whereHas('cabang', function (Builder $query) {
+                                $query->where('nama_cabang', 'like', '%Tilawah Anak-anak%');
+                            });
+                        } elseif ($value === 'tilawah remaja') {
+                            // Filter peserta dengan cabang Tilawah Remaja Putra atau Tilawah Remaja Putri
+                            return $query->whereHas('cabang', function (Builder $query) {
+                                $query->where('nama_cabang', 'like', '%Tilawah Remaja%');
+                            });
+                        } elseif ($value === 'tilawah dewasa') {
+                            // Filter peserta dengan cabang Tilawah Dewasa Putra atau Tilawah Dewasa Putri
+                            return $query->whereHas('cabang', function (Builder $query) {
+                                $query->where('nama_cabang', 'like', '%Tilawah Dewasa%');
+                            });
+                        } elseif ($value === 'mhq 1 juz dan tilawah') {
+                            // Filter peserta dengan cabang MHQ 1 juz dan Tilawah Putra atau MHQ 1 juz dan Tilawah Putri
+                            return $query->whereHas('cabang', function (Builder $query) {
+                                $query->where('nama_cabang', 'like', '%MHQ 1 juz dan Tilawah%');
+                            });
+                        } elseif ($value === 'mhq 5 juz dan tilawah') {
+                            // Filter peserta dengan cabang MHQ 5 juz dan Tilawah Putra atau MHQ 5 juz dan Tilawah Putri
+                            return $query->whereHas('cabang', function (Builder $query) {
+                                $query->where('nama_cabang', 'like', '%MHQ 5 juz dan Tilawah%');
+                            });
+                        } elseif ($value === 'mhq 10 juz') {
+                            // Filter peserta dengan cabang MHQ 10 juz Putra atau MHQ 10 juz Putri
+                            return $query->whereHas('cabang', function (Builder $query) {
+                                $query->where('nama_cabang', 'like', '%MHQ 10 juz%');
+                            });
+                        } elseif ($value === 'mhq 20 juz') {
+                            // Filter peserta dengan cabang MHQ 20 juz Putra atau MHQ 20 juz Putri
+                            return $query->whereHas('cabang', function (Builder $query) {
+                                $query->where('nama_cabang', 'like', '%MHQ 20 juz%');
+                            });
+                        } elseif ($value === 'mhq 30 juz') {
+                            // Filter peserta dengan cabang MHQ 30 juz Putra atau MHQ 30 juz Putri
+                            return $query->whereHas('cabang', function (Builder $query) {
+                                $query->where('nama_cabang', 'like', '%MHQ 30 juz%');
+                            });
+                        } elseif ($value === 'mfq') {
+                            // Filter peserta dengan cabang MFQ Putra atau MFQ Putri
+                            return $query->whereHas('cabang', function (Builder $query) {
+                                $query->where('nama_cabang', 'like', '%MFQ%');
+                            });
+                        } elseif ($value === 'msq') {
+                            // Filter peserta dengan cabang MSQ Putra atau MSQ Putri
+                            return $query->whereHas('cabang', function (Builder $query) {
+                                $query->where('nama_cabang', 'like', '%MSQ%');
+                            });
+                        } elseif ($value === 'mkq naskah') {
+                            // Filter peserta dengan cabang MKQ Naskah Putra atau MKQ Naskah Putri
+                            return $query->whereHas('cabang', function (Builder $query) {
+                                $query->where('nama_cabang', 'like', '%MKQ Naskah%');
+                            });
+                        } elseif ($value === 'mkq hiasan mushaf') {
+                            // Filter peserta dengan cabang MKQ Hiasan Mushaf Putra atau MKQ Hiasan Mushaf Putri
+                            return $query->whereHas('cabang', function (Builder $query) {
+                                $query->where('nama_cabang', 'like', '%MKQ Hiasan Mushaf%');
+                            });
+                        } elseif ($value === 'mkq dekorasi') {
+                            // Filter peserta dengan cabang MKQ Dekorasi Putra atau MKQ Dekorasi Putri
+                            return $query->whereHas('cabang', function (Builder $query) {
+                                $query->where('nama_cabang', 'like', '%MKQ Dekorasi%');
+                            });
+                        } elseif ($value === 'mkq kontemporer') {
+                            // Filter peserta dengan cabang MKQ Kontemporer Putra atau MKQ Kontemporer Putri
+                            return $query->whereHas('cabang', function (Builder $query) {
+                                $query->where('nama_cabang', 'like', '%MKQ Kontemporer%');
+                            });
+                        } elseif ($value === 'mmq') {
+                            // Filter peserta dengan cabang MMQ Putra atau MMQ Putri
+                            return $query->whereHas('cabang', function (Builder $query) {
+                                $query->where('nama_cabang', 'like', '%MMQ%');
+                            });
+                        }
+                        return $query;
+                    })
                     ->native(false),
                 SelectFilter::make('cabang.nama_cabang')
                     ->relationship('cabang', 'nama_cabang')
@@ -244,6 +438,8 @@ class PesertaResource extends Resource
                     ->native(false),
             ])
             ->actions([
+                Tables\Actions\ViewAction::make()
+                    ->label(__('Lihat')),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
@@ -267,6 +463,22 @@ class PesertaResource extends Resource
             'create' => Pages\CreatePeserta::route('/create'),
             'edit' => Pages\EditPeserta::route('/{record}/edit'),
         ];
+    }
+
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                TextEntry::make('nama')
+                    ->label(__('Nama')),
+                TextEntry::make('nik')
+                    ->label(__('NIK')),
+                ImageEntry::make('kk_ktp')
+                    ->label(__('KTP / KK'))
+                    ->width(800)
+                    ->height(500),
+            ])
+            ->columns(2);
     }
 
     protected static function parseAgeString($ageString)
