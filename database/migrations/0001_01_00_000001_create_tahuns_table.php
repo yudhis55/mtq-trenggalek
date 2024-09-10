@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->integer('tahun');
             $table->boolean('is_active')->default(false);
+            $table->date('batas_awal');
+            $table->date('batas_akhir');
             $table->timestamps();
         });
     }

@@ -24,6 +24,7 @@ use Filament\Notifications\Notification;
 use Illuminate\Support\HtmlString;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
+use Livewire\Attributes\Reactive;
 use PhpParser\Node\Stmt\Label;
 use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Hidden;
@@ -37,6 +38,7 @@ use Filament\Tables\Filters\QueryBuilder\Constraints\TextConstraint;
 use App\Models\Utusan;
 use App\Models\Tahun;
 use Closure;
+use Filament\Forms\Components\DatePicker;
 use Filament\Support\Enums\Alignment;
 
 class PesertaResource extends Resource
@@ -51,32 +53,128 @@ class PesertaResource extends Resource
     {
         return $form
             ->schema([
+                Forms\Components\Select::make('cabang_id')
+                    ->label(__('Cabang yang Diikuti'))
+                    ->required()
+                    ->preload()
+                    ->relationship('cabang', 'nama_cabang')
+                    ->options(function (Get $get) {
+                        $utusanId = $get('utusan_id');
+                        $tahunId = $get('tahun_id');
+
+                        if (!$utusanId || !$tahunId) {
+                            return [];
+                        }
+
+                        return Cabang::query()
+                            ->get()
+                            ->filter(function ($cabang) use ($utusanId, $tahunId) {
+                                // Mengambil kuota dari database
+                                $kuota = $cabang->kuota;
+
+                                // Hitung jumlah peserta yang sudah terdaftar untuk utusan dan tahun yang sama
+                                $jumlahPeserta = Peserta::where('utusan_id', $utusanId)
+                                    ->where('tahun_id', $tahunId)
+                                    ->where('cabang_id', $cabang->id)
+                                    ->count();
+
+                                return $jumlahPeserta < $kuota;
+                            })
+                            ->pluck('nama_cabang', 'id');
+                    })
+                    ->native(false)
+                    ->reactive()
+                    ->afterStateUpdated(function ($state, $get, $set) {
+                        $cabang = Cabang::find($state);
+                        if ($cabang) {
+                            // Set jenis kelamin berdasarkan gender cabang
+                            $set('jenis_kelamin', $cabang->gender_cabang);
+
+                            // Reset tanggal lahir jika cabang berubah
+                            $set('tgl_lahir', null);
+                        }
+                    })
+                    ->validationMessages([
+                        'required' => 'Kolom Cabang yang Diikuti tidak boleh kosong',
+                    ]),
                 Forms\Components\TextInput::make('nik')
                     ->label(__('NIK'))
                     ->validationAttribute('NIK')
-                    ->unique()
                     ->required()
                     ->numeric()
-                    ->length(16)
+                    ->minLength(16)
+                    ->maxLength(16)
                     ->live(onBlur: true)
-                    // ->unique(column: 'nik')
                     ->validationMessages([
                         'required' => 'Kolom NIK tidak boleh kosong',
-                        'unique' => 'NIK sudah pernah didaftarkan.',
+                        'numeric' => 'NIK harus berupa angka',
+                    ])
+                    ->rules([
+                        fn(Get $get): Closure => function (string $attribute, $value, Closure $fail) use ($get) {
+                            // Validasi panjang NIK
+                            if (strlen($value) !== 16) {
+                                $fail("NIK harus terdiri dari 16 digit.");
+                            }
+
+                            $tahunId = $get('tahun_id');
+                            if (!$tahunId) {
+                                $fail('Tahun belum dipilih.');
+                            }
+
+                            // Periksa apakah ada peserta dengan NIK dan tahun_id yang sama
+                            $pesertaExists = Peserta::where('nik', $value)
+                                ->where('tahun_id', $tahunId)
+                                ->exists();
+
+                            if ($pesertaExists) {
+                                $fail('NIK sudah terdaftar untuk tahun ini, gunakan NIK lain atau periksa kembali.');
+                            }
+                        },
                     ])
                     ->afterStateUpdated(function ($state, $set, $get) {
-                        $pesertaExists = Peserta::where('nik', $state)->exists();
-
-                        if (!$pesertaExists && strlen($state) == 16) {
-                            // NIK valid, lakukan tindakan lain jika diperlukan
-                        } else {
-                            // NIK tidak valid, kosongkan field
-                            // $set('nik', null);
+                        // Memastikan panjang state maksimal 16 digit
+                        if (strlen($state) > 16) {
+                            $set('nik', substr($state, 0, 16));
                             Notification::make()
-                                ->title(__('NIK tidak valid atau sudah terdaftar.'))
+                                ->title(__('NIK Tidak Valid'))
                                 ->danger()
-                                ->color('danger')
+                                ->body('Pastikan NIK berjumlah 16 digit')
                                 ->send();
+                        } elseif (strlen($state) < 16) {
+                            Notification::make()
+                                ->title(__('NIK Tidak Valid'))
+                                ->danger()
+                                ->body('Pastikan NIK berjumlah 16 digit')
+                                ->send();
+                        } else {
+                            $tahunId = $get('tahun_id');
+                            if (!$tahunId) {
+                                Notification::make()
+                                    ->title(__('Tahun belum dipilih'))
+                                    ->danger()
+                                    ->send();
+                                return;
+                            }
+
+                            // Periksa apakah ada peserta dengan NIK dan tahun_id yang sama
+                            $pesertaExists = Peserta::where('nik', $state)
+                                ->where('tahun_id', $tahunId)
+                                ->exists();
+
+                            if ($pesertaExists) {
+                                // NIK sudah terdaftar untuk tahun yang sama
+                                Notification::make()
+                                    ->title(__('NIK Sudah Terdaftar'))
+                                    ->danger()
+                                    ->body('NIK sudah terdaftar untuk tahun ini, gunakan NIK lain atau periksa kembali.')
+                                    ->send();
+                            } else {
+                                // NIK valid
+                                Notification::make()
+                                    ->title(__('NIK Valid'))
+                                    ->success()
+                                    ->send();
+                            }
                         }
                     }),
                 Forms\Components\TextInput::make('nama')
@@ -86,21 +184,9 @@ class PesertaResource extends Resource
                     ->validationMessages([
                         'required' => 'Kolom Nama tidak boleh kosong',
                     ]),
-                Forms\Components\Select::make('jenis_kelamin')
+                Hidden::make('jenis_kelamin')
                     ->label(__('Jenis Kelamin'))
-                    ->required()
-                    ->options([
-                        'putra' => 'Laki-Laki',
-                        'putri' => 'Perempuan',
-                    ])
-                    ->native(false)
-                    ->live()
-                    ->validationMessages([
-                        'required' => 'Kolom Jenis Kelamin tidak boleh kosong',
-                    ])
-                    ->afterStateUpdated(function ($state, $get, $set) {
-                        $set('cabang_id', null);
-                    }),
+                    ->required(),
                 Forms\Components\TextInput::make('tempat_lahir')
                     ->label(__('Tempat Lahir'))
                     ->required()
@@ -113,73 +199,16 @@ class PesertaResource extends Resource
                     ->required()
                     ->native(false)
                     ->closeOnDateSelection()
-                    ->format('d-m-Y')
                     ->displayFormat('d/m/Y')
                     ->live()
                     ->afterStateUpdated(function ($state, $get, $set) {
-                        // Kosongkan field cabang_id jika tanggal lahir diubah
-                        $set('cabang_id', null);
-                    })
-                    ->validationMessages([
-                        'required' => 'Kolom Tanggal Lahir tidak boleh kosong',
-                    ]),
-                Forms\Components\Select::make('cabang_id')
-                    ->required(fn(Get $get): bool => filled($get('tgl_lahir')))
-                    ->label(__('Cabang yang Diikuti'))
-                    ->required()
-                    ->preload()
-                    ->relationship('cabang', 'nama_cabang')
-                    ->live()
-                    ->options(function (Get $get) {
-                        $utusanId = $get('utusan_id');
-                        $jenisKelamin = $get('jenis_kelamin');
-
-                        if (!$utusanId || !$jenisKelamin) {
-                            return [];
-                        }
-
-                        // Kuota cabang
-                        $cabangKuota = [
-                            'MFQ Putra' => 3,
-                            'MFQ Putri' => 3,
-                            'MSQ Putra' => 3,
-                            'MSQ Putri' => 3,
-                        ];
-
-                        $selectedCabangKuota = 1;
-
-                        return Cabang::query()
-                            ->where('gender_cabang', $jenisKelamin)
-                            ->get()
-                            ->filter(function ($cabang) use ($utusanId, $cabangKuota, $selectedCabangKuota) {
-                                $kuota = $cabangKuota[$cabang->nama_cabang] ?? $selectedCabangKuota;
-                                $jumlahPeserta = Peserta::where('utusan_id', $utusanId)
-                                    ->where('cabang_id', $cabang->id)
-                                    ->count();
-
-                                return $jumlahPeserta < $kuota;
-                            })
-                            ->pluck('nama_cabang', 'id');
-                    })
-                    ->native(false)
-                    ->afterStateUpdated(function ($state, $get, $set) {
-                        $birthdate = $get('tgl_lahir');
-                        if (!$birthdate) {
-                            // Tanggal lahir belum dipilih, reset cabang_id dan beri notifikasi
-                            $set('cabang_id', null);
-                            Notification::make()
-                                ->title(__('Silakan mengisi tanggal lahir terlebih dahulu sebelum memilih cabang.'))
-                                ->danger()
-                                ->send();
-                            return;
-                        }
-
-                        $cabang = Cabang::find($state);
+                        // Lakukan validasi berdasarkan batas umur cabang
+                        $cabang = Cabang::find($get('cabang_id'));
                         if ($cabang) {
                             $perTanggal = Carbon::parse($cabang->per_tanggal);
-                            $ageInDays = Carbon::parse($birthdate)->diffInDays($perTanggal);
+                            $ageInDays = Carbon::parse($state)->diffInDays($perTanggal);
 
-                            // Parse batas_umur (e.g., '10 tahun 11 bulan 29 hari')
+                            // Batas umur diambil dari cabang (misalnya 10 tahun 11 bulan 29 hari)
                             $batasUmur = self::parseAgeString($cabang->batas_umur);
                             $maxAgeDate = $perTanggal->copy()
                                 ->subYears($batasUmur['years'])
@@ -188,7 +217,8 @@ class PesertaResource extends Resource
                             $maxAgeInDays = $maxAgeDate->diffInDays($perTanggal);
 
                             if ($ageInDays > $maxAgeInDays + 1) {
-                                $set('cabang_id', null);
+                                // Jika melebihi batas umur, kosongkan tanggal lahir
+                                $set('tgl_lahir', null);
                                 Notification::make()
                                     ->title(__('Usia peserta melebihi batas maksimal untuk cabang ini.'))
                                     ->danger()
@@ -196,9 +226,8 @@ class PesertaResource extends Resource
                             }
                         }
                     })
-                    ->reactive()
                     ->validationMessages([
-                        'required' => 'Kolom Cabang yang Diikuti tidak boleh kosong',
+                        'required' => 'Kolom Tanggal Lahir tidak boleh kosong',
                     ]),
                 Forms\Components\Textarea::make('alamat_ktp')
                     ->label(__('Alamat KTP'))
@@ -217,19 +246,6 @@ class PesertaResource extends Resource
                 Hidden::make('utusan_id')
                     ->label(__('Utusan Kecamatan'))
                     ->required()
-                    // ->options(function () {
-                    //     // Mendapatkan user yang sedang login
-                    //     $user = Auth::user();
-
-                    //     if ($user) {
-                    //         // Mencari kecamatan berdasarkan utusan_id user yang login
-                    //         $utusan = Utusan::where('id', $user->utusan_id)->first();
-                    //         if ($utusan) {
-                    //             return [$utusan->id => $utusan->kecamatan];
-                    //         }
-                    //     }
-                    //     return [];
-                    // })
                     ->default(function () {
                         // Mengatur nilai default ke utusan_id user yang login
                         $user = Auth::user();
@@ -275,6 +291,9 @@ class PesertaResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('nik')
+                    ->label(__('NIK'))
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('nama')
                     ->limit(15)
                     ->label(__('Nama'))
@@ -297,12 +316,9 @@ class PesertaResource extends Resource
                     ->falseColor('warning')
                     ->label('Status Verifikasi')
                     ->alignment(Alignment::Center),
-                Tables\Columns\TextColumn::make('alamat_ktp')
-                    ->limit(20)
-                    ->label(__('Alamat KTP')),
             ])
             ->emptyStateHeading('Daftar Peserta Kosong')
-            ->emptyStateDescription('Silahkan daftarkan peserta dengan memilih "New Peserta"')
+            ->emptyStateDescription('Silahkan daftarkan peserta dengan memilih "Tambah Peserta"')
             ->paginated(false)
             ->filters([
                 SelectFilter::make('cabang.nama_cabang')

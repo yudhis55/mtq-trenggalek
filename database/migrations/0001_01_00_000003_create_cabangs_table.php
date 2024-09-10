@@ -17,6 +17,11 @@ return new class extends Migration
             $table->string('gender_cabang');
             $table->string('batas_umur');
             $table->date('per_tanggal');
+            $table->integer('kuota');
+            $table->foreignId('tahun_id')->constrained(
+                table: 'tahuns',
+                indexName: 'cabangs_tahun_id'
+            );
             $table->timestamps();
         });
     }

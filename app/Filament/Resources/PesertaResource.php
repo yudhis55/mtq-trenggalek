@@ -36,6 +36,9 @@ use Filament\Infolists\Components\Section;
 use Filament\Tables\Filters\QueryBuilder\Constraints\TextConstraint;
 use App\Models\Tahun;
 use Illuminate\Support\Str;
+use Filament\Notifications\Livewire\Notifications;
+use Filament\Support\Enums\Alignment;
+use Filament\Support\Enums\VerticalAlignment;
 
 class PesertaResource extends Resource
 {
@@ -56,30 +59,43 @@ class PesertaResource extends Resource
             ->schema([
                 Forms\Components\TextInput::make('nik')
                     ->label(__('NIK'))
+                    ->validationAttribute('NIK')
                     ->unique()
                     ->required()
                     ->numeric()
-                    ->length(16)
-                    ->live()
-                    // ->unique(column: 'nik')
+                    ->minLength(16)
+                    ->maxLength(16)
+                    ->live(onBlur: true)
                     ->validationMessages([
                         'required' => 'Kolom NIK tidak boleh kosong',
                         'unique' => 'NIK sudah pernah didaftarkan.',
                     ])
                     ->afterStateUpdated(function ($state, $set, $get) {
+                        // Memastikan panjang state maksimal 16 digit
+                        if (strlen($state) > 16) {
+                            // Potong input menjadi 16 digit jika melebihi
+                            $set('nik', substr($state, 0, 16));
+                            Notification::make()
+                                ->title(__('NIK Tidak Valid'))
+                                ->danger()
+                                ->body('Pastikan NIK berjumlah 16 digit')
+                                ->send();
+                        }
+
                         $pesertaExists = Peserta::where('nik', $state)->exists();
 
-                        if (!$pesertaExists && strlen($state) == 16) {
+                        if (!$pesertaExists) {
                             // NIK valid, lakukan tindakan lain jika diperlukan
                         } else {
-                            // NIK tidak valid, kosongkan field
-                            // $set('nik', null);
+                            // NIK tidak valid, kosongkan field atau tampilkan notifikasi
                             Notification::make()
-                                ->title(__('NIK tidak valid atau sudah terdaftar.'))
+                                ->title(__('NIK Sudah Terdaftar.'))
                                 ->danger()
+                                ->body('Pastikan NIK belum pernah didaftarkan')
                                 ->send();
                         }
                     }),
+
                 Forms\Components\TextInput::make('nama')
                     ->label(__('Nama Lengkap'))
                     ->required()
@@ -114,7 +130,6 @@ class PesertaResource extends Resource
                     ->required()
                     ->native(false)
                     ->closeOnDateSelection()
-                    ->format('d-m-Y')
                     ->displayFormat('d/m/Y')
                     ->live()
                     ->afterStateUpdated(function ($state, $get, $set) {
@@ -258,44 +273,17 @@ class PesertaResource extends Resource
                         $tahun = Tahun::where('is_active', true)->first();
                         return $tahun ? $tahun->id : null;
                     }),
-                // FileUpload::make('akta')
-                //     ->label(__('Akta Kelahiran'))
-                //     ->required()
-                //     ->openable()
-                //     ->image()
-                //     ->maxSize(512)
-                //     ->validationMessages([
-                //         'required' => 'File Akta Kelahiran belum diunggah',
-                //     ])
-                //     ->moveFiles(),
-                // FileUpload::make('ijazah')
-                //     ->label(__('Ijazah Terakhir'))
-                //     ->required()
-                //     ->image()
-                //     ->openable()
-                //     ->maxSize(512)
-                //     ->validationMessages([
-                //         'required' => 'File Ijazah Terakhir belum diunggah',
-                //     ])
-                //     ->moveFiles(),
-                // FileUpload::make('piagam')
-                //     ->label(__('Piagam'))
-                //     ->required()
-                //     ->image()
-                //     ->openable()
-                //     ->maxSize(512)
-                //     ->validationMessages([
-                //         'required' => 'File Piagam belum diunggah',
-                //     ])
-                //     ->moveFiles(),
             ])
-            ->columns(2);
+            ->columns(1);
     }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('nik')
+                    ->label(__('NIK'))
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('nama')
                     ->limit(15)
                     ->label(__('Nama'))
@@ -318,7 +306,7 @@ class PesertaResource extends Resource
                     ->searchable(),
                 ToggleColumn::make('is_verified')
                     ->label(__('Verifikasi')),
-                Tables\Columns\TextColumn::make('tahun.tahun')
+                // Tables\Columns\TextColumn::make('tahun.tahun')
             ])
             ->filters([
                 SelectFilter::make('utusan.kecamatan')
@@ -469,14 +457,14 @@ class PesertaResource extends Resource
     {
         return $infolist
             ->schema([
-                TextEntry::make('nama')
-                    ->label(__('Nama')),
-                TextEntry::make('nik')
-                    ->label(__('NIK')),
-                ImageEntry::make('kk_ktp')
-                    ->label(__('KTP / KK'))
-                    ->width(800)
-                    ->height(500),
+                // TextEntry::make('nama')
+                //     ->label(__('Nama')),
+                // TextEntry::make('nik')
+                //     ->label(__('NIK')),
+                // ImageEntry::make('kk_ktp')
+                //     ->label(__('KTP / KK'))
+                //     ->width(800)
+                //     ->height(500),
             ])
             ->columns(2);
     }

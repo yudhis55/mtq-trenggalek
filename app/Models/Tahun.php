@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 
 class Tahun extends Model
 {
@@ -26,5 +27,10 @@ class Tahun extends Model
     public function peserta(): HasMany
     {
         return $this->hasMany(Peserta::class);
+    }
+
+    public function cabang(): HasMany
+    {
+        return $this->hasMany(Cabang::class);
     }
 }

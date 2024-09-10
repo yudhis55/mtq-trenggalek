@@ -15,7 +15,7 @@ class StatsKecamatanOverview extends BaseWidget
         $user = Auth::user();
 
         // Menghitung jumlah peserta yang dibuat oleh user yang login saat ini
-        $jumlahPeserta = Peserta::where('user_id', $user->id)->count();
+        $jumlahPeserta = Peserta::where('utusan_id', $user->utusan_id)->count();
 
         // Menghitung pemenuhan kuota peserta
         $kuotaMaksimal = 40; // Kuota maksimal per kecamatan

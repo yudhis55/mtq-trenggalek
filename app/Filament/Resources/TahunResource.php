@@ -37,7 +37,8 @@ class TahunResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('tahun'),
-                ToggleColumn::make('is_active'),
+                ToggleColumn::make('is_active')
+                    ->label('Status Aktif'),
             ])
             ->filters([
                 //

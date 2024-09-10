@@ -11,4 +11,5 @@ class CreatePeserta extends CreateRecord
     protected static string $resource = PesertaResource::class;
 
     protected static ?string $title = 'Tambah Peserta';
+
 }

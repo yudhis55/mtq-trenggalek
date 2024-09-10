@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Traits\HasRoles;
+use Carbon\Carbon;
 
 class User extends Authenticatable implements FilamentUser
 {
@@ -77,4 +78,6 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->asset('images/logotgx.png');
     }
+
+
 }
