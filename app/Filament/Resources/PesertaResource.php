@@ -39,6 +39,10 @@ use Illuminate\Support\Str;
 use Filament\Notifications\Livewire\Notifications;
 use Filament\Support\Enums\Alignment;
 use Filament\Support\Enums\VerticalAlignment;
+use Closure;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
+use Filament\Tables\Columns\IconColumn;
+
 
 class PesertaResource extends Resource
 {
@@ -47,6 +51,8 @@ class PesertaResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
 
     protected static ?string $navigationLabel = 'Peserta';
+
+    protected static ?string $navigationGroup = 'Manajemen Peserta';
 
     public static function getNavigationBadge(): ?string
     {
@@ -60,7 +66,6 @@ class PesertaResource extends Resource
                 Forms\Components\TextInput::make('nik')
                     ->label(__('NIK'))
                     ->validationAttribute('NIK')
-                    ->unique()
                     ->required()
                     ->numeric()
                     ->minLength(16)
@@ -68,31 +73,74 @@ class PesertaResource extends Resource
                     ->live(onBlur: true)
                     ->validationMessages([
                         'required' => 'Kolom NIK tidak boleh kosong',
-                        'unique' => 'NIK sudah pernah didaftarkan.',
+                        'numeric' => 'NIK harus berupa angka',
+                    ])
+                    ->rules([
+                        fn(Get $get): Closure => function (string $attribute, $value, Closure $fail) use ($get) {
+                            // Validasi panjang NIK
+                            if (strlen($value) !== 16) {
+                                $fail("NIK harus terdiri dari 16 digit.");
+                            }
+
+                            $tahunId = $get('tahun_id');
+                            if (!$tahunId) {
+                                $fail('Tahun belum dipilih.');
+                            }
+
+                            // Periksa apakah ada peserta dengan NIK dan tahun_id yang sama
+                            $pesertaExists = Peserta::where('nik', $value)
+                                ->where('tahun_id', $tahunId)
+                                ->exists();
+
+                            if ($pesertaExists) {
+                                $fail('NIK sudah pernah didaftarkan, periksa kembali');
+                            }
+                        },
                     ])
                     ->afterStateUpdated(function ($state, $set, $get) {
                         // Memastikan panjang state maksimal 16 digit
                         if (strlen($state) > 16) {
-                            // Potong input menjadi 16 digit jika melebihi
                             $set('nik', substr($state, 0, 16));
                             Notification::make()
                                 ->title(__('NIK Tidak Valid'))
                                 ->danger()
                                 ->body('Pastikan NIK berjumlah 16 digit')
                                 ->send();
-                        }
-
-                        $pesertaExists = Peserta::where('nik', $state)->exists();
-
-                        if (!$pesertaExists) {
-                            // NIK valid, lakukan tindakan lain jika diperlukan
-                        } else {
-                            // NIK tidak valid, kosongkan field atau tampilkan notifikasi
+                        } elseif (strlen($state) < 16) {
                             Notification::make()
-                                ->title(__('NIK Sudah Terdaftar.'))
+                                ->title(__('NIK Tidak Valid'))
                                 ->danger()
-                                ->body('Pastikan NIK belum pernah didaftarkan')
+                                ->body('Pastikan NIK berjumlah 16 digit')
                                 ->send();
+                        } else {
+                            $tahunId = $get('tahun_id');
+                            if (!$tahunId) {
+                                Notification::make()
+                                    ->title(__('Tahun belum dipilih'))
+                                    ->danger()
+                                    ->send();
+                                return;
+                            }
+
+                            // Periksa apakah ada peserta dengan NIK dan tahun_id yang sama
+                            $pesertaExists = Peserta::where('nik', $state)
+                                ->where('tahun_id', $tahunId)
+                                ->exists();
+
+                            if ($pesertaExists) {
+                                // NIK sudah terdaftar untuk tahun yang sama
+                                Notification::make()
+                                    ->title(__('NIK Sudah Terdaftar'))
+                                    ->danger()
+                                    ->body('NIK sudah pernah didaftarkan, periksa kembali')
+                                    ->send();
+                            } else {
+                                // NIK valid
+                                Notification::make()
+                                    ->title(__('NIK Valid'))
+                                    ->success()
+                                    ->send();
+                            }
                         }
                     }),
 
@@ -130,7 +178,7 @@ class PesertaResource extends Resource
                     ->required()
                     ->native(false)
                     ->closeOnDateSelection()
-                    ->displayFormat('d/m/Y')
+                    ->displayFormat('d-m-Y')
                     ->live()
                     ->afterStateUpdated(function ($state, $get, $set) {
                         // Kosongkan field cabang_id jika tanggal lahir diubah
@@ -166,7 +214,6 @@ class PesertaResource extends Resource
                         'required' => 'Kolom Utusan Kecamatan tidak boleh kosong',
                     ]),
                 Forms\Components\Select::make('cabang_id')
-                    ->required()
                     ->label(__('Cabang yang Diikuti'))
                     ->preload()
                     ->relationship('cabang', 'nama_cabang')
@@ -175,27 +222,20 @@ class PesertaResource extends Resource
                     ->options(function (Get $get) {
                         $utusanId = $get('utusan_id');
                         $jenisKelamin = $get('jenis_kelamin');
+                        $tahunId = $get('tahun_id');
 
-                        if (!$utusanId || !$jenisKelamin) {
+                        if (!$utusanId || !$jenisKelamin || !$tahunId) {
                             return [];
                         }
-
-                        // Kuota cabang
-                        $cabangKuota = [
-                            'MFQ Putra' => 3,
-                            'MFQ Putri' => 3,
-                            'MSQ Putra' => 3,
-                            'MSQ Putri' => 3,
-                        ];
-
-                        $selectedCabangKuota = 1;
 
                         return Cabang::query()
                             ->where('gender_cabang', $jenisKelamin)
                             ->get()
-                            ->filter(function ($cabang) use ($utusanId, $cabangKuota, $selectedCabangKuota) {
-                                $kuota = $cabangKuota[$cabang->nama_cabang] ?? $selectedCabangKuota;
+                            ->filter(function ($cabang) use ($utusanId, $tahunId) {
+                                $kuota = $cabang->kuota;
+
                                 $jumlahPeserta = Peserta::where('utusan_id', $utusanId)
+                                    ->where('tahun_id', $tahunId)
                                     ->where('cabang_id', $cabang->id)
                                     ->count();
 
@@ -281,40 +321,61 @@ class PesertaResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('id')
+                    ->label(__('No'))
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('nik')
                     ->label(__('NIK'))
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('nama')
                     ->limit(15)
                     ->label(__('Nama'))
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('jenis_kelamin')
-                    ->label(__('L/P')),
+                    ->label(__('L/P'))
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('tempat_lahir')
                     ->label(__('Tempat Lahir'))
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('tgl_lahir')
-                    ->label(__('Tgl Lahir')),
+                    ->label(__('Tgl Lahir'))
+                    ->date('d-m-Y')
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('alamat_ktp')
                     ->limit(20)
-                    ->label(__('Alamat KTP')),
+                    ->label(__('Alamat KTP'))
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('utusan.kecamatan')
                     ->label(__('Utusan'))
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('cabang.nama_cabang')
                     ->label(__('Cabang'))
-                    ->searchable(),
-                ToggleColumn::make('is_verified')
-                    ->label(__('Verifikasi')),
+                    ->searchable()
+                    ->toggleable(),
+                IconColumn::make('is_verified')
+                    ->label(__('Verifikasi'))
+                    ->size(IconColumn\IconColumnSize::ExtraLarge)
+                    ->boolean()
+                    ->action(function ($record, $column) {
+                        $name = $column->getName();
+                        $record->update([
+                            $name => !$record->$name
+                        ]);
+                    })
+                    ->toggleable(),
                 // Tables\Columns\TextColumn::make('tahun.tahun')
             ])
             ->filters([
                 SelectFilter::make('utusan.kecamatan')
                     ->relationship('utusan', 'kecamatan')
-                    ->label(__(' Bace Kecamatan'))
+                    ->label(__('Kecamatan'))
                     ->native(false),
                 SelectFilter::make('cabang_merged')
-                    ->label('Bace Cabang')
+                    ->label('Cabang')
                     ->options([
                         'tartil' => 'Tartil',
                         'tilawah anak-anak' => 'Tilawah Anak-anak',
@@ -422,13 +483,19 @@ class PesertaResource extends Resource
                     ->native(false),
                 SelectFilter::make('cabang.nama_cabang')
                     ->relationship('cabang', 'nama_cabang')
-                    ->label(__('Cabang'))
+                    ->label(__('Kategori'))
                     ->native(false),
+            ])
+            ->headerActions([
+                ExportAction::make('export')
+                    ->label(__('Download Excel'))
+                    ->color('success'),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()
                     ->label(__('Lihat')),
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->label(__('Edit')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -457,14 +524,20 @@ class PesertaResource extends Resource
     {
         return $infolist
             ->schema([
-                // TextEntry::make('nama')
-                //     ->label(__('Nama')),
-                // TextEntry::make('nik')
-                //     ->label(__('NIK')),
-                // ImageEntry::make('kk_ktp')
-                //     ->label(__('KTP / KK'))
-                //     ->width(800)
-                //     ->height(500),
+                TextEntry::make('nama')
+                    ->label(__('Nama')),
+                TextEntry::make('nik')
+                    ->label(__('NIK')),
+                TextEntry::make('tempat_lahir'),
+                TextEntry::make('tgl_lahir'),
+                TextEntry::make('alamat_ktp'),
+                // TextEntry::make('alamat_domisili'),
+                ImageEntry::make('kk_ktp')
+                    ->columnSpanFull()
+                    ->label(__('KTP / KK'))
+                    ->width(800)
+                    ->height(600),
+
             ])
             ->columns(2);
     }

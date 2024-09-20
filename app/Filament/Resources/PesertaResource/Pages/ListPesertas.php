@@ -5,6 +5,9 @@ namespace App\Filament\Resources\PesertaResource\Pages;
 use App\Filament\Resources\PesertaResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Support\Enums\ActionSize;
+use pxlrbt\FilamentExcel\Actions\Pages\ExportAction;
+
 
 class ListPesertas extends ListRecords
 {
@@ -15,7 +18,10 @@ class ListPesertas extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()
+                ->label('Tambah Peserta')
+                ->size(ActionSize::Large)
+                ->icon('heroicon-o-user-plus'),
         ];
     }
 }

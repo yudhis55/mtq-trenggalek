@@ -5,6 +5,7 @@ namespace App\Filament\Kecamatan\Resources\PesertaResource\Pages;
 use App\Filament\Kecamatan\Resources\PesertaResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Support\Enums\ActionSize;
 
 class EditPeserta extends EditRecord
 {
@@ -13,7 +14,10 @@ class EditPeserta extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            Actions\DeleteAction::make()
+                ->label('Hapus Peserta')
+                ->size(ActionSize::Large)
+                ->icon('heroicon-o-user-minus'),
         ];
     }
 

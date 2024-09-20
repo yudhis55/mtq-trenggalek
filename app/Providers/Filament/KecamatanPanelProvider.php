@@ -66,6 +66,7 @@ class KecamatanPanelProvider extends PanelProvider
             ->brandLogoHeight('3.4rem')
             ->sidebarWidth('19rem')
             ->defaultThemeMode(ThemeMode::Light)
-            ->favicon(asset('images/logotgxmini.png'));
+            ->favicon(asset('images/logotgxmini.png'))
+            ->breadcrumbs(false);
     }
 }

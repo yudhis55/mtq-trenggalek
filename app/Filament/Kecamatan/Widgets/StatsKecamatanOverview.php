@@ -22,8 +22,8 @@ class StatsKecamatanOverview extends BaseWidget
         $persentaseKuota = ($jumlahPeserta / $kuotaMaksimal) * 100;
 
         // Menghitung sebaran gender peserta
-        $pesertaLakiLaki = Peserta::where('user_id', $user->id)->where('jenis_kelamin', 'putra')->count();
-        $pesertaPerempuan = Peserta::where('user_id', $user->id)->where('jenis_kelamin', 'putri')->count();
+        $pesertaLakiLaki = Peserta::where('utusan_id', $user->utusan_id)->where('jenis_kelamin', 'putra')->count();
+        $pesertaPerempuan = Peserta::where('utusan_id', $user->utusan_id)->where('jenis_kelamin', 'putri')->count();
         $sebaranGender = $pesertaLakiLaki . ' : ' . $pesertaPerempuan;
 
         return [

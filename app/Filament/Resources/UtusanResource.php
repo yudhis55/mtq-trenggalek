@@ -17,7 +17,7 @@ class UtusanResource extends Resource
 {
     protected static ?string $model = Utusan::class;
 
-    protected static ?string $navigationIcon = 'heroicon-c-map-pin';
+    protected static ?string $navigationIcon = 'heroicon-o-map-pin';
 
     protected static ?string $navigationLabel = 'Utusan Kecamatan';
 
@@ -38,6 +38,9 @@ class UtusanResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('id')
+                    ->label('No')
+                    ->width(50),
                 Tables\Columns\TextColumn::make('kecamatan'),
             ])
             ->filters([

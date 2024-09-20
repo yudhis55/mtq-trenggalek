@@ -49,8 +49,7 @@ class CabangResource extends Resource
                     ->required()
                     ->native(false)
                     ->closeOnDateSelection()
-                    ->format('d-m-Y')
-                    ->displayFormat('d/m/Y'),
+                    ->displayFormat('d-m-Y'),
             ]);
     }
 
@@ -58,10 +57,14 @@ class CabangResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('id')
+                    ->label('No'),
                 Tables\Columns\TextColumn::make('nama_cabang'),
                 Tables\Columns\TextColumn::make('gender_cabang'),
                 Tables\Columns\TextColumn::make('batas_umur'),
-                Tables\Columns\TextColumn::make('per_tanggal'),
+                Tables\Columns\TextColumn::make('per_tanggal')
+                    ->date('d-m-Y'),
+                Tables\Columns\TextColumn::make('kuota'),
             ])
             ->filters([
                 //

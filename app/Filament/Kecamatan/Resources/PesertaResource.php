@@ -127,7 +127,7 @@ class PesertaResource extends Resource
                                 ->exists();
 
                             if ($pesertaExists) {
-                                $fail('NIK sudah terdaftar untuk tahun ini, gunakan NIK lain atau periksa kembali.');
+                                $fail('NIK sudah pernah didaftarkan, periksa kembali');
                             }
                         },
                     ])
@@ -166,7 +166,7 @@ class PesertaResource extends Resource
                                 Notification::make()
                                     ->title(__('NIK Sudah Terdaftar'))
                                     ->danger()
-                                    ->body('NIK sudah terdaftar untuk tahun ini, gunakan NIK lain atau periksa kembali.')
+                                    ->body('NIK sudah pernah didaftarkan, periksa kembali')
                                     ->send();
                             } else {
                                 // NIK valid
@@ -180,6 +180,7 @@ class PesertaResource extends Resource
                 Forms\Components\TextInput::make('nama')
                     ->label(__('Nama Lengkap'))
                     ->required()
+                    ->notIn(['fukri', 'rejected'])
                     ->maxLength(255)
                     ->validationMessages([
                         'required' => 'Kolom Nama tidak boleh kosong',
@@ -199,7 +200,7 @@ class PesertaResource extends Resource
                     ->required()
                     ->native(false)
                     ->closeOnDateSelection()
-                    ->displayFormat('d/m/Y')
+                    ->displayFormat('d-m-Y')
                     ->live()
                     ->afterStateUpdated(function ($state, $get, $set) {
                         // Lakukan validasi berdasarkan batas umur cabang
@@ -302,7 +303,8 @@ class PesertaResource extends Resource
                     ->label(__('Tempat Lahir'))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('tgl_lahir')
-                    ->label(__('Tgl Lahir')),
+                    ->label(__('Tgl Lahir'))
+                    ->date('d-m-Y'),
                 Tables\Columns\TextColumn::make('cabang.nama_cabang')
                     ->label(__('Cabang'))
                     ->searchable(),

@@ -4,6 +4,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Peserta\CreatePeserta;
 use App\Livewire\Peserta\EditPeserta;
+use App\Http\Middleware\XSS;
+use Livewire\Livewire;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,5 +19,17 @@ use App\Livewire\Peserta\EditPeserta;
 */
 
 // Route::view('/', 'welcome')->name('home');
-// Route::get('/', CreatePeserta::class);
-// Route::get('/edit', EditPeserta::class);
+// Route::get('/tes1', CreatePeserta::class);
+// Route::get('/tes2', EditPeserta::class);
+// Route::get('/livewire/update', function () {
+//     return view('welcome');
+// });
+
+
+Route::fallback(function() {
+    return redirect()->back();
+});
+
+// Route::middleware('auth')->group(function () {
+//     Route::post('/livewire/update', [HttpConnectionHandler::class, 'update'])->name('livewire.update');
+// });

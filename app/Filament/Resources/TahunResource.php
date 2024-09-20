@@ -6,6 +6,8 @@ use App\Filament\Resources\TahunResource\Pages;
 use App\Filament\Resources\TahunResource\RelationManagers;
 use App\Models\Tahun;
 use Filament\Forms;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -19,7 +21,7 @@ class TahunResource extends Resource
 {
     protected static ?int $navigationSort = 5;
     protected static ?string $navigationLabel = 'Tahun';
-    protected static ?string $navigationGroup = 'Settings';
+    protected static ?string $navigationGroup = 'Pengaturan';
     protected static ?string $model = Tahun::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-calendar-date-range';
@@ -28,8 +30,25 @@ class TahunResource extends Resource
     {
         return $form
             ->schema([
-                //
-            ]);
+                TextInput::make('tahun')
+                    ->label('Tahun')
+                    ->required()
+                    ->numeric()
+                    ->unique(ignoreRecord: true),
+                DatePicker::make('batas_awal')
+                    ->label('Tanggal Dibuka')
+                    ->required()
+                    ->native(false)
+                    ->closeOnDateSelection()
+                    ->displayFormat('d-m-Y'),
+                DatePicker::make('batas_akhir')
+                    ->label('Tanggal Ditutup')
+                    ->required()
+                    ->native(false)
+                    ->closeOnDateSelection()
+                    ->displayFormat('d-m-Y'),
+            ])
+            ->columns(1);
     }
 
     public static function table(Table $table): Table
@@ -39,6 +58,12 @@ class TahunResource extends Resource
                 TextColumn::make('tahun'),
                 ToggleColumn::make('is_active')
                     ->label('Status Aktif'),
+                TextColumn::make('batas_awal')
+                    ->label('Tanggal Dibuka')
+                    ->date('d-m-Y'),
+                TextColumn::make('batas_akhir')
+                    ->label('Tanggal Ditutup')
+                    ->date('d-m-Y'),
             ])
             ->filters([
                 //
