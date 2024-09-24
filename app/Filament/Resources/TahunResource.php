@@ -55,6 +55,9 @@ class TahunResource extends Resource
     {
         return $table
             ->columns([
+                TextColumn::make('index')
+                    ->label('No')
+                    ->rowIndex(),
                 TextColumn::make('tahun'),
                 ToggleColumn::make('is_active')
                     ->label('Status Aktif'),

@@ -17,6 +17,7 @@ use App\Models\Peserta;
 use Filament\Tables\Columns\ToggleColumn;
 use PhpOffice\PhpSpreadsheet\Calculation\Logical\Boolean;
 use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
 
 class PesertaVerifiedResource extends Resource
 {
@@ -40,6 +41,9 @@ class PesertaVerifiedResource extends Resource
     {
         return $table
             ->columns([
+                TextColumn::make('index')
+                    ->label('No')
+                    ->rowIndex(),
                 IconColumn::make('is_verified')
                     ->label('Diterima')
                     ->boolean()

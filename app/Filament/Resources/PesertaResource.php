@@ -42,7 +42,7 @@ use Filament\Support\Enums\VerticalAlignment;
 use Closure;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
 use Filament\Tables\Columns\IconColumn;
-
+use Filament\Tables\Columns\TextColumn;
 
 class PesertaResource extends Resource
 {
@@ -321,8 +321,9 @@ class PesertaResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('id')
-                    ->label(__('No'))
+                TextColumn::make('index')
+                    ->label('No')
+                    ->rowIndex()
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('nik')
                     ->label(__('NIK'))
