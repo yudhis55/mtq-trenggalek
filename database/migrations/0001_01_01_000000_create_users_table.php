@@ -22,6 +22,14 @@ return new class extends Migration
                 table: 'utusans',
                 indexName: 'users_utusan_id',
             );
+            $table->foreignId('cabang_id_satu')->nullable()->constrained(
+                table: 'cabangs',
+                indexName: 'users_cabang_id_satu',
+                );
+            $table->foreignId('cabang_id_dua')->nullable()->constrained(
+                table: 'cabangs',
+                indexName: 'users_cabang_id_dua',
+                    );
             $table->rememberToken();
             $table->timestamps();
         });
