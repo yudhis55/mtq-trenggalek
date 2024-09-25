@@ -144,7 +144,7 @@ class DatabaseSeeder extends Seeder
         User::create([
             'name' => 'Tartil',
             'email' =>'tartil@penilaian.com',
-            'password' => Hash::make('kontolodon'),
+            'password' => Hash::make('akamsi'),
             'role' => 'user',
             'cabang_id_satu' => 1 ,
             'cabang_id_dua' => 2 ,
@@ -258,6 +258,6 @@ class DatabaseSeeder extends Seeder
         ]);
 
 
-        
+
     }
 }

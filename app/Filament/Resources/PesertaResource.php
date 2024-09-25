@@ -569,6 +569,7 @@ class PesertaResource extends Resource
                     ->label(__('Nama')),
                 TextEntry::make('nik')
                     ->label(__('NIK')),
+                ImageEntry::make('pasfoto'),
                 TextEntry::make('tempat_lahir'),
                 TextEntry::make('tgl_lahir'),
                 TextEntry::make('alamat_ktp'),
@@ -580,7 +581,7 @@ class PesertaResource extends Resource
                     ->height(600),
 
             ])
-            ->columns(2);
+            ->columns(3);
     }
 
     protected static function parseAgeString($ageString)
