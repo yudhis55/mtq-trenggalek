@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Traits\HasRoles;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class User extends Authenticatable implements FilamentUser
 {
@@ -58,9 +59,9 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(Peserta::class);
     }
 
-    public function utusan(): HasOne
+    public function utusan(): BelongsTo
     {
-        return $this->hasOne(Utusan::class);
+        return $this->belongsTo(Utusan::class);
     }
 
     public function canAccessPanel(Panel $panel): bool

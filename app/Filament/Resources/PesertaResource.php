@@ -363,9 +363,49 @@ class PesertaResource extends Resource
                     ->boolean()
                     ->action(function ($record, $column) {
                         $name = $column->getName();
-                        $record->update([
-                            $name => !$record->$name
-                        ]);
+                        $isVerified = !$record->$name;
+
+                        // Jika verifikasi berhasil
+                        if ($isVerified) {
+                            if (in_array($record->cabang_id, [1, 2])) {
+                                // Tambahkan data baru di tabel nilai_tartils
+                                \App\Models\NilaiTartil::create([
+                                    'tajwid' => null,
+                                    'irama_dan_suara' => null,
+                                    'fashahah' => null,
+                                    'total' => null,
+                                    'peserta_id' => $record->id,
+                                ]);
+                                Notification::make()
+                                    ->title('Verifikasi Berhasil')
+                                    ->body('Peserta ' . $record->nama . ' berhasil diverifikasi')
+                                    ->success()
+                                    ->send();
+                            }
+                        } else {
+                            // Jika membatalkan verifikasi, pastikan total null atau 0
+                            $nilaiTartil = \App\Models\NilaiTartil::where('peserta_id', $record->id)->first();
+                            if ($nilaiTartil && ($nilaiTartil->total === null || $nilaiTartil->total == 0)) {
+                                // Hapus data jika memenuhi syarat
+                                $nilaiTartil->delete();
+                            } else {
+                                // Mungkin tambahkan notifikasi bahwa penghapusan gagal
+                                // return back()->with('error', 'Gagal membatalkan verifikasi: total tidak null atau tidak 0.');
+                                return Notification::make()
+                                    ->title('Pembatalan Verifikasi Gagal')
+                                    ->body('Silahkan kosongkan terlebih dahulu nilai dari peserta ' . $record->nama)
+                                    ->danger()
+                                    ->send();
+                            }
+                            Notification::make()
+                                    ->title('Pembatalan Verifikasi Berhasil')
+                                    ->body('Pembatalan verifikasi peserta ' . $record->nama . ' berhasil dilakukan')
+                                    ->success()
+                                    ->send();
+                        }
+
+                        // Update status verifikasi
+                        $record->update([$name => $isVerified]);
                     })
                     ->toggleable(),
                 // Tables\Columns\TextColumn::make('tahun.tahun')

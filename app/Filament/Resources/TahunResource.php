@@ -19,7 +19,7 @@ use Filament\Tables\Columns\ToggleColumn;
 
 class TahunResource extends Resource
 {
-    protected static ?int $navigationSort = 5;
+    protected static ?int $navigationSort = 6;
     protected static ?string $navigationLabel = 'Tahun';
     protected static ?string $navigationGroup = 'Pengaturan';
     protected static ?string $model = Tahun::class;

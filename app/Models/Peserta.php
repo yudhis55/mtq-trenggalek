@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Peserta extends Model
 {
@@ -28,5 +29,10 @@ class Peserta extends Model
     public function tahun(): BelongsTo
     {
         return $this->belongsTo(Tahun::class);
+    }
+
+    public function nilaitartil(): HasOne
+    {
+        return $this->hasOne(NilaiTartil::class);
     }
 }
