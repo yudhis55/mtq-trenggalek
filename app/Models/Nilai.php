@@ -2,14 +2,18 @@
 
 namespace App\Models;
 
-use App\Models\Peserta;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class NilaiTartil extends Model
+class Nilai extends Model
 {
     use HasFactory;
+
+    public function variabel(): BelongsTo
+    {
+        return $this->belongsTo(Variabel::class);
+    }
 
     public function peserta(): BelongsTo
     {

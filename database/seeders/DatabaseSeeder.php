@@ -140,5 +140,124 @@ class DatabaseSeeder extends Seeder
             'role' => 'user',
             'utusan_id' => 14,
         ]);
+
+        User::create([
+            'name' => 'Tartil',
+            'email' =>'tartil@penilaian.com',
+            'password' => Hash::make('kontolodon'),
+            'role' => 'user',
+            'cabang_id_satu' => 1 ,
+            'cabang_id_dua' => 2 ,
+        ]);
+
+        User::create([
+            'name' => 'Tilawah Anak-anak',
+            'email' => 'tilawahanak@penilaian.com',
+            'password' => Hash::make('akamsi'),
+            'role' => 'user',
+            'cabang_id_satu' => 3,
+            'cabang_id_dua' => 4,
+        ]);
+
+        User::create([
+            'name' => 'Tilawah Remaja',
+            'email' => 'tilawahremaja@penilaian.com',
+            'password' => Hash::make('akamsi'),
+            'role' => 'user',
+            'cabang_id_satu' => 5,
+            'cabang_id_dua' => 6,
+        ]);
+
+        User::create([
+            'name' => 'Tilawah Dewasa',
+            'email' => 'tilawahdewasa@penilaian.com',
+            'password' => Hash::make('akamsi'),
+            'role' => 'user',
+            'cabang_id_satu' => 7,
+            'cabang_id_dua' => 8,
+        ]);
+
+        User::create([
+            'name' => 'MHQ 1 Juz dan Tilawah',
+            'email' => 'mhq1juzdantilawah@penilaian.com',
+            'password' => Hash::make('akamsi'),
+            'role' => 'user',
+            'cabang_id_satu' => 9,
+            'cabang_id_dua' => 10,
+        ]);
+
+        User::create([
+            'name' => 'MHQ 5 Juz dan Tilawah',
+            'email' => 'mhq5juzdantilawah@penilaian.com',
+            'password' => Hash::make('akamsi'),
+            'role' => 'user',
+            'cabang_id_satu' => 11,
+            'cabang_id_dua' => 12,
+        ]);
+
+        User::create([
+            'name' => 'MHQ 10 Juz dan Tilawah',
+            'email' => 'mhq10juzdantilawah@penilaian.com',
+            'password' => Hash::make('akamsi'),
+            'role' => 'user',
+            'cabang_id_satu' => 13,
+            'cabang_id_dua' => 14,
+        ]);
+
+        User::create([
+            'name' => 'MHQ 20 Juz dan Tilawah',
+            'email' => 'mhq20juzdantilawah@penilaian.com',
+            'password' => Hash::make('akamsi'),
+            'role' => 'user',
+            'cabang_id_satu' => 15,
+            'cabang_id_dua' => 16,
+        ]);
+
+        User::create([
+            'name' => 'MHQ 30 Juz dan Tilawah',
+            'email' => 'mhq30juzdantilawah@penilaian.com',
+            'password' => Hash::make('akamsi'),
+            'role' => 'user',
+            'cabang_id_satu' => 17,
+            'cabang_id_dua' => 18,
+        ]);
+
+        User::create([
+            'name' => 'MFQ',
+            'email' => 'mfq@penilaian.com',
+            'password' => Hash::make('akamsi'),
+            'role' => 'user',
+            'cabang_id_satu' => 19,
+            'cabang_id_dua' => 20,
+        ]);
+
+        User::create([
+            'name' => 'MSQ',
+            'email' => 'msq@penilaian.com',
+            'password' => Hash::make('akamsi'),
+            'role' => 'user',
+            'cabang_id_satu' => 21,
+            'cabang_id_dua' => 22,
+        ]);
+
+        User::create([
+            'name' => 'MKQ Naskah',
+            'email' => 'mkqnaskah@penilaian.com',
+            'password' => Hash::make('akamsi'),
+            'role' => 'user',
+            'cabang_id_satu' => 23,
+            'cabang_id_dua' => 24,
+        ]);
+
+        User::create([
+            'name' => 'MKQ Hiasan',
+            'email' => 'mkqhiasan@penilaian.com',
+            'password' => Hash::make('akamsi'),
+            'role' => 'user',
+            'cabang_id_satu' => 25,
+        ]);
+
+
+        
     }
 }

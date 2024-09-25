@@ -4,16 +4,16 @@ namespace App\Filament\Resources\NilaiTartilResource\Pages;
 
 use App\Filament\Resources\NilaiTartilResource;
 use Filament\Actions;
-use Filament\Resources\Pages\EditRecord;
+use Filament\Resources\Pages\ManageRecords;
 
-class EditNilaiTartil extends EditRecord
+class ManageNilaiTartils extends ManageRecords
 {
     protected static string $resource = NilaiTartilResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            // Actions\CreateAction::make(),
         ];
     }
 }

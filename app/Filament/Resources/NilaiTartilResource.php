@@ -2,20 +2,19 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\NilaiTartilResource\Pages;
-use App\Filament\Resources\NilaiTartilResource\RelationManagers;
-use App\Models\NilaiTartil;
-use Faker\Provider\ar_EG\Text;
 use Filament\Forms;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use App\Models\NilaiTartil;
+use Filament\Resources\Resource;
+use Filament\Forms\Components\Select;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\NilaiTartilResource\Pages;
+use App\Filament\Resources\NilaiTartilResource\RelationManagers;
 
 class NilaiTartilResource extends Resource
 {
@@ -65,7 +64,9 @@ class NilaiTartilResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->label('Input Nilai'),
+                // Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -74,19 +75,10 @@ class NilaiTartilResource extends Resource
             ]);
     }
 
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
-    }
-
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListNilaiTartils::route('/'),
-            'create' => Pages\CreateNilaiTartil::route('/create'),
-            'edit' => Pages\EditNilaiTartil::route('/{record}/edit'),
+            'index' => Pages\ManageNilaiTartils::route('/'),
         ];
     }
 }

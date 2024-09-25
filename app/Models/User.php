@@ -64,6 +64,13 @@ class User extends Authenticatable implements FilamentUser
         return $this->belongsTo(Utusan::class);
     }
 
+    public function penilaian(): HasOne
+    {
+        return $this->hasOne(penilaian::class);
+    }
+
+   
+
     public function canAccessPanel(Panel $panel): bool
     {
         if ($panel->getId() === 'admin') {
@@ -71,6 +78,9 @@ class User extends Authenticatable implements FilamentUser
         }
         if ($panel->getId() === 'kecamatan') {
             return str_ends_with($this->email, '@mtq.com');
+        }
+        if ($panel->getId() === 'penilaian') {
+            return str_ends_with($this->email, '@penilaian.com');
         }
         return false;
     }
