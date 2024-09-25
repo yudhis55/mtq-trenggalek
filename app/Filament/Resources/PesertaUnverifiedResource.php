@@ -2,19 +2,20 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\PesertaUnverifiedResource\Pages;
-use App\Filament\Resources\PesertaUnverifiedResource\RelationManagers;
-use App\Models\PesertaUnverified;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Models\Peserta;
+use Filament\Forms\Form;
+use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use App\Models\PesertaUnverified;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\PesertaUnverifiedResource\Pages;
+use App\Filament\Resources\PesertaUnverifiedResource\RelationManagers;
 
 class PesertaUnverifiedResource extends Resource
 {
@@ -45,8 +46,15 @@ class PesertaUnverifiedResource extends Resource
                 TextColumn::make('nama'),
                 TextColumn::make('alamat_ktp')
                     ->wrap(),
-                ToggleColumn::make('is_verified')
-                    ->label('Diterima'),
+                IconColumn::make('is_verified')
+                    ->label('Diterima')
+                    ->boolean()
+                    ->action(function ($record, $column) {
+                        $name = $column->getName();
+                        $record->update([
+                            $name => !$record->$name
+                        ]);
+                    }),
             ])
             ->filters([
                 //

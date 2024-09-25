@@ -44,6 +44,10 @@ class PesertaVerifiedResource extends Resource
                 TextColumn::make('index')
                     ->label('No')
                     ->rowIndex(),
+                TextColumn::make('nik'),
+                TextColumn::make('nama'),
+                TextColumn::make('alamat_ktp')
+                    ->wrap(),
                 IconColumn::make('is_verified')
                     ->label('Diterima')
                     ->boolean()
