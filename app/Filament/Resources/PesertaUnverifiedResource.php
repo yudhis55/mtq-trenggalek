@@ -21,11 +21,16 @@ class PesertaUnverifiedResource extends Resource
 {
     protected static ?string $model = Peserta::class;
 
-    protected static ?string $navigationLabel = 'Total Pendaftar';
+    protected static ?string $navigationLabel = 'Belum Diterima';
 
     protected static ?string $navigationIcon = 'heroicon-o-x-circle';
 
     protected static ?string $navigationGroup = 'Manajemen Peserta';
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::where('is_verified', false)->count();
+    }
 
     public static function form(Form $form): Form
     {

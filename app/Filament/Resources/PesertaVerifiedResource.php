@@ -29,6 +29,11 @@ class PesertaVerifiedResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-check-circle';
 
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::where('is_verified', true)->count();
+    }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -46,6 +51,8 @@ class PesertaVerifiedResource extends Resource
                     ->rowIndex(),
                 TextColumn::make('nik'),
                 TextColumn::make('nama'),
+                TextColumn::make('tempat_dan_tanggal_lahir')
+                    ->label('Tempat, Tanggal Lahir'),
                 TextColumn::make('alamat_ktp')
                     ->wrap(),
                 IconColumn::make('is_verified')
@@ -83,7 +90,7 @@ class PesertaVerifiedResource extends Resource
         return [
             'index' => Pages\ListPesertaVerifieds::route('/'),
             'create' => Pages\CreatePesertaVerified::route('/create'),
-            'edit' => Pages\EditPesertaVerified::route('/{record}/edit'),
+            // 'edit' => Pages\EditPesertaVerified::route('/{record}/edit'),
         ];
     }
 

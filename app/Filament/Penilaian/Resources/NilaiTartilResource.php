@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Penilaian\Resources;
 
 use Filament\Forms;
 use Filament\Tables;
@@ -37,11 +37,10 @@ class NilaiTartilResource extends Resource
             ->schema([
                 Split::make([
                     Section::make([
-                        TextInput::make('peserta_id')
-                            // ->relationship('peserta', 'nama')
+                        Select::make('peserta_id')
+                            ->relationship('peserta', 'nama')
                             ->live(onBlur: true)
-                            ->disabled()
-                            ->formatStateUsing(fn(NilaiTartil $record): string => $record->peserta->nama ?? ''),
+                            ->disabled(),
                         TextInput::make('tajwid')
                             ->numeric()
                             ->default(0)
@@ -49,6 +48,7 @@ class NilaiTartilResource extends Resource
                             ->maxValue(40)
                             ->helperText(new HtmlString('<strong>Petunjuk :</strong> Input nilai maksimal 40'))
                             ->afterStateUpdated(function ($state, callable $set, Get $get) {
+                                $state = (int) $state;
                                 if ($state > 40) {
                                     Notification::make()
                                         ->title(__('Nilai melebihi batas maksimum'))
@@ -56,10 +56,7 @@ class NilaiTartilResource extends Resource
                                         ->body('Maksimal nilai untuk Tajwid adalah 40')
                                         ->send();
                                 }
-                                $irama_dan_suara = floatval($get('irama_dan_suara'));
-                                $fashahah = floatval($get('fashahah'));
-                                $total = floatval($state) + $irama_dan_suara + $fashahah;
-                                $set('total', floatval($total));
+                                $set('total', $get('irama_dan_suara') + $get('fashahah') + $state);
                             }),
                         TextInput::make('irama_dan_suara')
                             ->numeric()
@@ -68,6 +65,7 @@ class NilaiTartilResource extends Resource
                             ->maxValue(30)
                             ->helperText(new HtmlString('<strong>Petunjuk :</strong> Input nilai maksimal 30'))
                             ->afterStateUpdated(function ($state, callable $set, Get $get) {
+                                $state = (int) $state;
                                 if ($state > 30) {
                                     Notification::make()
                                         ->title(__('Nilai melebihi batas maksimum'))
@@ -75,10 +73,7 @@ class NilaiTartilResource extends Resource
                                         ->body('Maksimal nilai untuk Irama dan Suara adalah 30')
                                         ->send();
                                 }
-                                $tajwid = floatval($get('tajwid'));
-                                $fashahah = floatval($get('fashahah'));
-                                $total = floatval($state) + $tajwid + $fashahah;
-                                $set('total', floatval($total));
+                                $set('total', $get('tajwid') + $state + $get('fashahah'));
                             }),
                         TextInput::make('fashahah')
                             ->numeric()
@@ -87,6 +82,7 @@ class NilaiTartilResource extends Resource
                             ->maxValue(30)
                             ->helperText(new HtmlString('<strong>Petunjuk :</strong> Input nilai maksimal 30'))
                             ->afterStateUpdated(function ($state, callable $set, Get $get) {
+                                $state = (int) $state;
                                 if ($state > 30) {
                                     Notification::make()
                                         ->title(__('Nilai melebihi batas maksimum'))
@@ -94,10 +90,7 @@ class NilaiTartilResource extends Resource
                                         ->body('Maksimal nilai untuk Fashahah adalah 30')
                                         ->send();
                                 }
-                                $tajwid = floatval($get('tajwid'));
-                                $irama_dan_suara = floatval($get('irama_dan_suara'));
-                                $total = floatval($state) + $tajwid + $irama_dan_suara;
-                                $set('total', floatval($total));
+                                $set('total', $get('tajwid') + $get('irama_dan_suara') + $state);
                             }),
                     ]),
                     Section::make([
@@ -127,23 +120,22 @@ class NilaiTartilResource extends Resource
                 TextColumn::make('tajwid'),
                 TextColumn::make('irama_dan_suara'),
                 TextColumn::make('fashahah'),
-                TextColumn::make('total'),
+                TextColumn::make('total')
+                    ->sortable(query: function (Builder $query, string $direction): Builder {
+                        return $query
+                            ->orderBy('total', $direction)
+                            ->orderBy('tajwid', $direction)
+                            ->orderBy('irama_dan_suara', $direction)
+                            ->orderBy('fashahah', $direction);
+                    }),
             ])
-            ->defaultSort('final_bobot', 'desc')
+            ->defaultSort('total', 'desc')
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
-                    ->label('Input Nilai')
-                    ->after(function ($data, $record) {
-                        $record->bobot_total = $record->total * 100000000;
-                        $record->bobot_tajwid = $record->tajwid * 1000000;
-                        $record->bobot_irama_dan_suara = $record->irama_dan_suara * 10000;
-                        $record->bobot_fashahah = $record->fashahah * 100;
-                        $record->final_bobot = $record->bobot_tajwid + $record->bobot_irama_dan_suara + $record->bobot_fashahah + $record->bobot_total;
-                        $record->save();
-                    }),
+                    ->label('Input Nilai'),
                 // Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([

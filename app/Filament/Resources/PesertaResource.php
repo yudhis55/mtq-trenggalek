@@ -2,47 +2,48 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\PesertaResource\Pages;
-use App\Filament\Resources\PesertaResource\RelationManagers;
-use App\Models\Peserta;
-use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Forms\Components\FileUpload;
-use Filament\Tables\Columns\ImageColumn;
-use Illuminate\Support\Collection;
-use App\Models\Cabang;
-use Filament\Forms\Get;
-use Illuminate\Validation\ValidationException;
+use Closure;
 use Carbon\Carbon;
-use Filament\Forms\Components\TextInput;
-use Filament\Notifications\Notification;
+use Filament\Forms;
+use Filament\Tables;
+use App\Models\Tahun;
+use App\Models\Cabang;
+use App\Models\Peserta;
+use Filament\Forms\Get;
+use Filament\Forms\Form;
+use Filament\Tables\Table;
+use Illuminate\Support\Str;
+use PhpParser\Node\Stmt\Label;
+use Filament\Infolists\Infolist;
+use Filament\Resources\Resource;
+use Filament\Actions\CreateAction;
+use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Filament\Tables\Filters\Filter;
-use Filament\Tables\Filters\SelectFilter;
-use PhpParser\Node\Stmt\Label;
 use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Hidden;
-use Filament\Infolists\Components\ImageEntry;
-use Filament\Infolists\Components\TextEntry;
-use Filament\Tables\Columns\ToggleColumn;
-use Filament\Infolists\Infolist;
-use Filament\Infolists\Components\Actions\Action;
-use Filament\Infolists\Components\Section;
-use Filament\Tables\Filters\QueryBuilder\Constraints\TextConstraint;
-use App\Models\Tahun;
-use Illuminate\Support\Str;
-use Filament\Notifications\Livewire\Notifications;
 use Filament\Support\Enums\Alignment;
-use Filament\Support\Enums\VerticalAlignment;
-use Closure;
-use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Forms\Components\FileUpload;
+use Filament\Tables\Columns\ToggleColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Illuminate\Database\Eloquent\Builder;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Components\ImageEntry;
+use Filament\Support\Enums\VerticalAlignment;
+use Illuminate\Validation\ValidationException;
+use App\Filament\Resources\PesertaResource\Pages;
+use Filament\Infolists\Components\Actions\Action;
+use Filament\Notifications\Livewire\Notifications;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
+use App\Filament\Resources\PesertaResource\RelationManagers;
+use Filament\Tables\Filters\QueryBuilder\Constraints\TextConstraint;
 
 class PesertaResource extends Resource
 {
@@ -531,6 +532,9 @@ class PesertaResource extends Resource
                 ExportAction::make('export')
                     ->label(__('Download Excel'))
                     ->color('success'),
+                Tables\Actions\CreateAction::make()
+                    ->label(__('Tambah Peserta'))
+                    ->icon('heroicon-o-user-plus'),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()

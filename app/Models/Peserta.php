@@ -13,6 +13,15 @@ class Peserta extends Model
 {
     use HasFactory;
 
+    protected $casts = [
+        'tgl_lahir' => 'date',
+    ];
+
+    public function getTempatDanTanggalLahirAttribute()
+    {
+        return $this->tempat_lahir . ', ' . $this->tgl_lahir->format('d F Y');
+    }
+
     public function utusan(): BelongsTo
     {
         return $this->belongsTo(Utusan::class);

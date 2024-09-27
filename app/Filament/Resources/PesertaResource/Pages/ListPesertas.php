@@ -18,10 +18,13 @@ class ListPesertas extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()
-                ->label('Tambah Peserta')
-                ->size(ActionSize::Large)
-                ->icon('heroicon-o-user-plus'),
+            // Actions\CreateAction::make()
+            //     ->label('Tambah Peserta')
+            //     ->size(ActionSize::Large)
+            //     ->icon('heroicon-o-user-plus'),
+            // ExportAction::make('export')
+            //     ->label(__('Download Excel'))
+            //     ->color('success'),
         ];
     }
 }

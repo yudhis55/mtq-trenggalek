@@ -13,10 +13,15 @@ return new class extends Migration
     {
         Schema::create('nilai_tartils', function (Blueprint $table) {
             $table->id();
-            $table->decimal('tajwid')->nullable();
-            $table->decimal('irama_dan_suara')->nullable();
-            $table->decimal('fashahah')->nullable();
-            $table->decimal('total')->nullable();
+            $table->float('tajwid')->nullable();
+            $table->float('bobot_tajwid')->nullable();
+            $table->float('irama_dan_suara')->nullable();
+            $table->float('bobot_irama_dan_suara')->nullable();
+            $table->float('fashahah')->nullable();
+            $table->float('bobot_fashahah')->nullable();
+            $table->float('total')->nullable();
+            $table->float('bobot_total')->nullable();
+            $table->float('final_bobot')->nullable();
             $table->foreignId('peserta_id')->constrained(
                 table: 'pesertas',
                 indexName: 'tartils_peserta_id'
