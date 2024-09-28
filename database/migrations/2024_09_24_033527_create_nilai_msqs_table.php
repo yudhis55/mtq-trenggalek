@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('nilai_msqs', function (Blueprint $table) {
             $table->id();
-            $table->float('terjemahan_dan_penghayatan')->nullable();
-            $table->float('bobot_terjemahan_dan_penghayatan')->nullable();
+            $table->float('terjemahan_dan_materi')->nullable();
+            $table->float('bobot_terjemahan_dan_materi')->nullable();
             $table->float('penghayatan_dan_retorika')->nullable();
             $table->float('bobot_penghayatan_dan_retorika')->nullable();
             $table->float('tilawah')->nullable();

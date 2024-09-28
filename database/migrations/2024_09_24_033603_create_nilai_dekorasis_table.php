@@ -15,10 +15,10 @@ return new class extends Migration
             $table->id();
             $table->float('kebenaran_kaidah_khath')->nullable();
             $table->float('bobot_kebenaran_kaidah_khath')->nullable();
-            $table->float('keindahan_khat')->nullable();
-            $table->float('bobot_keindahan_khat')->nullable();
-            $table->float('sentuhan_akhir')->nullable();
-            $table->float('bobot_sentuhan_akhir')->nullable();
+            $table->float('keindahan_khath')->nullable();
+            $table->float('bobot_keindahan_khath')->nullable();
+            $table->float('keindahan_hiasan_dan_lukisan')->nullable();
+            $table->float('bobot_keindahan_hiasan_dan_lukisan')->nullable();
             $table->float('total')->nullable();
             $table->float('bobot_total')->nullable();
             $table->float('final_bobot')->nullable();
