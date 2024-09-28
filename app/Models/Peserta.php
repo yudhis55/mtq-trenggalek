@@ -92,11 +92,6 @@ class Peserta extends Model
         return $this->hasOne(NilaiMfq::class);
     }
 
-    public function nilaimkq(): HasOne
-    {
-        return $this->hasOne(NilaiMkq::class);
-    }
-
     public function nilaimmq(): HasOne
     {
         return $this->hasOne(NilaiMmq::class);
