@@ -17,10 +17,6 @@ class Cabang extends Model
         return $this->hasMany(Peserta::class);
     }
 
-    public function variabel(): HasMany
-    {
-        return $this->hasMany(Variabel::class);
-    }
 
     public function tahun(): BelongsTo
     {
@@ -29,5 +25,5 @@ class Cabang extends Model
 
     protected $dates = ['per_tanggal'];
 
-    
+
 }

@@ -18,7 +18,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\NilaiTartilResource\Pages;
+use App\Filament\Penilaian\Resources\NilaiTartilResource\Pages;
 use App\Filament\Resources\NilaiTartilResource\RelationManagers;
 
 class NilaiTartilResource extends Resource
@@ -37,10 +37,11 @@ class NilaiTartilResource extends Resource
             ->schema([
                 Split::make([
                     Section::make([
-                        Select::make('peserta_id')
-                            ->relationship('peserta', 'nama')
+                        TextInput::make('peserta_id')
+                            // ->relationship('peserta', 'nama')
                             ->live(onBlur: true)
-                            ->disabled(),
+                            ->disabled()
+                            ->formatStateUsing(fn(NilaiTartil $record): string => $record->peserta->nama ?? ''),
                         TextInput::make('tajwid')
                             ->numeric()
                             ->default(0)
@@ -48,15 +49,17 @@ class NilaiTartilResource extends Resource
                             ->maxValue(40)
                             ->helperText(new HtmlString('<strong>Petunjuk :</strong> Input nilai maksimal 40'))
                             ->afterStateUpdated(function ($state, callable $set, Get $get) {
-                                $state = (int) $state;
                                 if ($state > 40) {
                                     Notification::make()
-                                        ->title(__('Nilai melebihi batas maksimum'))
+                                        ->title(('Nilai melebihi batas maksimum'))
                                         ->danger()
                                         ->body('Maksimal nilai untuk Tajwid adalah 40')
                                         ->send();
                                 }
-                                $set('total', $get('irama_dan_suara') + $get('fashahah') + $state);
+                                $irama_dan_suara = floatval($get('irama_dan_suara'));
+                                $fashahah = floatval($get('fashahah'));
+                                $total = floatval($state) + $irama_dan_suara + $fashahah;
+                                $set('total', floatval($total));
                             }),
                         TextInput::make('irama_dan_suara')
                             ->numeric()
@@ -65,15 +68,17 @@ class NilaiTartilResource extends Resource
                             ->maxValue(30)
                             ->helperText(new HtmlString('<strong>Petunjuk :</strong> Input nilai maksimal 30'))
                             ->afterStateUpdated(function ($state, callable $set, Get $get) {
-                                $state = (int) $state;
                                 if ($state > 30) {
                                     Notification::make()
-                                        ->title(__('Nilai melebihi batas maksimum'))
+                                        ->title(('Nilai melebihi batas maksimum'))
                                         ->danger()
                                         ->body('Maksimal nilai untuk Irama dan Suara adalah 30')
                                         ->send();
                                 }
-                                $set('total', $get('tajwid') + $state + $get('fashahah'));
+                                $tajwid = floatval($get('tajwid'));
+                                $fashahah = floatval($get('fashahah'));
+                                $total = floatval($state) + $tajwid + $fashahah;
+                                $set('total', floatval($total));
                             }),
                         TextInput::make('fashahah')
                             ->numeric()
@@ -82,15 +87,17 @@ class NilaiTartilResource extends Resource
                             ->maxValue(30)
                             ->helperText(new HtmlString('<strong>Petunjuk :</strong> Input nilai maksimal 30'))
                             ->afterStateUpdated(function ($state, callable $set, Get $get) {
-                                $state = (int) $state;
                                 if ($state > 30) {
                                     Notification::make()
-                                        ->title(__('Nilai melebihi batas maksimum'))
+                                        ->title(('Nilai melebihi batas maksimum'))
                                         ->danger()
                                         ->body('Maksimal nilai untuk Fashahah adalah 30')
                                         ->send();
                                 }
-                                $set('total', $get('tajwid') + $get('irama_dan_suara') + $state);
+                                $tajwid = floatval($get('tajwid'));
+                                $irama_dan_suara = floatval($get('irama_dan_suara'));
+                                $total = floatval($state) + $tajwid + $irama_dan_suara;
+                                $set('total', floatval($total));
                             }),
                     ]),
                     Section::make([
@@ -120,27 +127,40 @@ class NilaiTartilResource extends Resource
                 TextColumn::make('tajwid'),
                 TextColumn::make('irama_dan_suara'),
                 TextColumn::make('fashahah'),
-                TextColumn::make('total')
-                    ->sortable(query: function (Builder $query, string $direction): Builder {
-                        return $query
-                            ->orderBy('total', $direction)
-                            ->orderBy('tajwid', $direction)
-                            ->orderBy('irama_dan_suara', $direction)
-                            ->orderBy('fashahah', $direction);
-                    }),
+                TextColumn::make('total'),
             ])
-            ->defaultSort('total', 'desc')
+            ->defaultSort('final_bobot', 'desc')
             ->filters([
-                //
+
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
-                    ->label('Input Nilai'),
-                // Tables\Actions\DeleteAction::make(),
+                    ->label('Input Nilai')
+                    ->after(function ($data, $record) {
+                        $record->bobot_total = $record->total * 100000000;
+                        $record->bobot_tajwid = $record->tajwid * 1000000;
+                        $record->bobot_irama_dan_suara = $record->irama_dan_suara * 10000;
+                        $record->bobot_fashahah = $record->fashahah * 100;
+                        $record->final_bobot = $record->bobot_tajwid + $record->bobot_irama_dan_suara + $record->bobot_fashahah + $record->bobot_total;
+                        $record->save();
+                    })
+                    ->modalHeading('Input Nilai')
+                    ->modalDescription('Pastikan input nilai sudah sesuai, karena tidak bisa diubah')
+                    ->hidden(fn ($record): bool => $record->total != 0 && $record->total != null &&
+                        $record->tajwid != 0 && $record->tajwid != null &&
+                        $record->irama_dan_suara != 0 && $record->irama_dan_suara != null &&
+                        $record->fashahah != 0 && $record->fashahah != null
+                    ),
+                Tables\Actions\ViewAction::make()
+                    ->label('Lihat Nilai')
+                    ->hidden(fn ($record): bool => $record->total == 0 || $record->total == null ||
+                        $record->tajwid == 0 || $record->tajwid == null ||
+                        $record->irama_dan_suara == 0 || $record->irama_dan_suara == null ||
+                        $record->fashahah == 0 || $record->fashahah == null),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    // Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
     }

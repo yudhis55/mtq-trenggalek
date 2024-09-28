@@ -13,15 +13,16 @@ return new class extends Migration
     {
         Schema::create('nilai_mmqs', function (Blueprint $table) {
             $table->id();
-            $table->decimal('bobot_materi', 2, 2)->nullable();
-            $table->decimal('max_bobot_materi', 2, 2)->nullable();
-            $table->decimal('kaidah_dan_gaya_bahasa', 2, 2)->nullable();
-            $table->decimal('max_kaidah_dan_gaya_bahasa', 2, 2)->nullable();
-            $table->decimal('logika_dan_organisasi_pesan', 2, 2)->nullable();
-            $table->decimal('max_logika_dan_organisasi_pesan', 2, 2)->nullable();
-            $table->decimal('presentasi', 2, 2)->nullable();
-            $table->decimal('max_presentasi', 2, 2)->nullable();
-            $table->decimal('total', 4, 2)->nullable();
+            $table->float('bobot_materi')->nullable();
+            $table->float('bobot_bobot_materi')->nullable();
+            $table->float('kaidah_dan_gaya_bahasa')->nullable();
+            $table->float('bobot_kaidah_dan_gaya_bahasa')->nullable();
+            $table->float('logika_dan_organisasi_pesan')->nullable();
+            $table->float('bobot_logika_dan_organisasi_pesan')->nullable();
+            $table->float('presentasi')->nullable();
+            $table->float('total')->nullable();
+            $table->float('bobot_total')->nullable();
+            $table->float('final_bobot')->nullable();
             $table->foreignId('peserta_id')->constrained(
                 table: 'pesertas',
                 indexName: 'mmq_peserta_id'

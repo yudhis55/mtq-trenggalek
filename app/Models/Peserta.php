@@ -46,4 +46,74 @@ class Peserta extends Model
     {
         return $this->hasOne(NilaiTartil::class);
     }
+
+    public function nilaianak(): HasOne
+    {
+        return $this->hasOne(NilaiAnak::class);
+    }
+
+    public function nilairemaja(): HasOne
+    {
+        return $this->hasOne(NilaiRemaja::class);
+    }
+
+    public function nilaidewasa(): HasOne
+    {
+        return $this->hasOne(NilaiDewasa::class);
+    }
+
+    public function nilaisatujuz(): HasOne
+    {
+        return $this->hasOne(NilaiSatuJuz::class);
+    }
+
+    public function nilailimajuz(): HasOne
+    {
+        return $this->hasOne(NilaiLimaJuz::class);
+    }
+
+    public function nilaisepuluhjuz(): HasOne
+    {
+        return $this->hasOne(NilaiSepuluhJuz::class);
+    }
+
+    public function nilaiduapuluhjuz(): HasOne
+    {
+        return $this->hasOne(NilaiDuapuluhJuz::class);
+    }
+
+    public function nilaitigapuluhjuz(): HasOne
+    {
+        return $this->hasOne(NilaiTigapuluhJuz::class);
+    }
+
+    public function nilaimfq(): HasOne
+    {
+        return $this->hasOne(NilaiMfq::class);
+    }
+
+    public function nilaimkq(): HasOne
+    {
+        return $this->hasOne(NilaiMkq::class);
+    }
+
+    public function nilaimmq(): HasOne
+    {
+        return $this->hasOne(NilaiMmq::class);
+    }
+
+    public function nilaimsq(): HasOne
+    {
+        return $this->hasOne(NilaiMsq::class);
+    }
+
+    public function nilaimushaf(): HasOne
+    {
+        return $this->hasOne(NilaiMushaf::class);
+    }
+
+    public function nilainaskah(): HasOne
+    {
+        return $this->hasOne(NilaiNaskah::class);
+    }
 }

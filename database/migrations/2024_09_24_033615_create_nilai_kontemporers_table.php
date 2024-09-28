@@ -13,13 +13,15 @@ return new class extends Migration
     {
         Schema::create('nilai_kontemporers', function (Blueprint $table) {
             $table->id();
-            $table->decimal('unsur_kaligrafi', 2, 2)->nullable();
-            $table->decimal('max_unsur_kaligrafi', 2, 2)->nullable();
-            $table->decimal('unsur_seni_rupa', 2, 2)->nullable();
-            $table->decimal('max_unsur_seni_rupa', 2, 2)->nullable();
-            $table->decimal('sentuhan_akhir', 2, 2)->nullable();
-            $table->decimal('max_sentuhan_akhir', 2, 2)->nullable();
-            $table->decimal('total', 4, 2)->nullable();
+            $table->float('unsur_kaligrafi')->nullable();
+            $table->float('bobot_unsur_kaligrafi')->nullable();
+            $table->float('unsur_seni_rupa')->nullable();
+            $table->float('bobot_unsur_seni_rupa')->nullable();
+            $table->float('sentuhan_akhir')->nullable();
+            $table->float('bobot_sentuhan_akhir')->nullable();
+            $table->float('total')->nullable();
+            $table->float('bobot_total')->nullable();
+            $table->float('final_bobot')->nullable();
             $table->foreignId('peserta_id')->constrained(
                 table: 'pesertas',
                 indexName: 'kontemporer_peserta_id'
