@@ -18,6 +18,8 @@ class UtusanResource extends Resource
 {
     protected static ?string $model = Utusan::class;
 
+    protected static ?int $navigationSort = 2;
+
     protected static ?string $navigationIcon = 'heroicon-o-map-pin';
 
     protected static ?string $navigationLabel = 'Utusan Kecamatan';

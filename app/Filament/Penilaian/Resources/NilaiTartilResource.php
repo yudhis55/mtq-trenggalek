@@ -120,7 +120,8 @@ class NilaiTartilResource extends Resource
                     ->label('No')
                     ->rowIndex(),
                 TextColumn::make('peserta.nama')
-                    ->label('Nama'),
+                    ->label('Nama')
+                    ->searchable(),
                 TextColumn::make('peserta.jenis_kelamin')
                     ->label('Jenis Kelamin'),
                 TextColumn::make('peserta.utusan.kecamatan'),

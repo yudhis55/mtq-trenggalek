@@ -19,6 +19,8 @@ class CabangResource extends Resource
 {
     protected static ?string $model = Cabang::class;
 
+    protected static ?int $navigationSort = 1;
+
     protected static ?string $navigationIcon = 'heroicon-o-trophy';
 
     protected static ?string $navigationLabel = 'Cabang Lomba';

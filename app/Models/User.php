@@ -64,13 +64,6 @@ class User extends Authenticatable implements FilamentUser
         return $this->belongsTo(Utusan::class);
     }
 
-    public function penilaian(): HasOne
-    {
-        return $this->hasOne(penilaian::class);
-    }
-
-   
-
     public function canAccessPanel(Panel $panel): bool
     {
         if ($panel->getId() === 'admin') {

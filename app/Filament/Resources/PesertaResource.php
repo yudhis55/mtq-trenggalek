@@ -49,6 +49,8 @@ class PesertaResource extends Resource
 {
     protected static ?string $model = Peserta::class;
 
+    protected static ?int $navigationSort = 51;
+
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
 
     protected static ?string $navigationLabel = 'Peserta';
@@ -337,7 +339,8 @@ class PesertaResource extends Resource
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('jenis_kelamin')
                     ->label(__('L/P'))
-                    ->toggleable(),
+                    ->toggleable()
+                    ->formatStateUsing(fn (Peserta $record): string => $record->jenis_kelamin == 'putra' ? 'L' : 'P'),
                 Tables\Columns\TextColumn::make('tempat_lahir')
                     ->label(__('Tempat Lahir'))
                     ->searchable()
@@ -631,7 +634,7 @@ class PesertaResource extends Resource
                         $record->update([$name => $isVerified]);
                     })
                     ->toggleable(),
-                // Tables\Columns\TextColumn::make('tahun.tahun')
+                Tables\Columns\TextColumn::make('tahun.tahun')
             ])
             ->filters([
                 SelectFilter::make('utusan.kecamatan')

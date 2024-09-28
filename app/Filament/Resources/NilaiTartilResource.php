@@ -25,7 +25,7 @@ class NilaiTartilResource extends Resource
 {
     protected static ?string $model = NilaiTartil::class;
 
-    protected static ?int $navigationSort = 5;
+    protected static ?int $navigationSort = 101;
 
     protected static ?string $navigationGroup = 'Penilaian';
 
@@ -117,12 +117,14 @@ class NilaiTartilResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('index')
-                    ->label('No')
+                    ->label('Rank')
                     ->rowIndex(),
                 TextColumn::make('peserta.nama')
-                    ->label('Nama'),
+                    ->label('Nama')
+                    ->searchable(),
                 TextColumn::make('peserta.jenis_kelamin')
-                    ->label('Jenis Kelamin'),
+                    ->label('L / P')
+                    ->formatStateUsing(fn (NilaiTartil $record): string => $record->peserta->jenis_kelamin == 'putra' ? 'L' : 'P'),
                 TextColumn::make('peserta.utusan.kecamatan'),
                 TextColumn::make('tajwid'),
                 TextColumn::make('irama_dan_suara'),
@@ -143,7 +145,9 @@ class NilaiTartilResource extends Resource
                         $record->bobot_fashahah = $record->fashahah * 100;
                         $record->final_bobot = $record->bobot_tajwid + $record->bobot_irama_dan_suara + $record->bobot_fashahah + $record->bobot_total;
                         $record->save();
-                    }),
+                    })
+                    ->modalHeading('Input Nilai')
+                    ->modalDescription('Pastikan input nilai sudah sesuai, karena tidak bisa diubah'),
                 // Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
