@@ -29,6 +29,7 @@ return new class extends Migration
             $table->float('bobot_tah_fashahah')->nullable();
             $table->float('total_tilawah')->nullable();
             $table->float('bobot_tilawah')->nullable();
+            $table->float('bobot_total_tahfizh')->nullable();
             $table->float('total_tahfizh')->nullable();
             $table->float('bobot_tahfizh')->nullable();
             $table->float('total')->nullable();
@@ -39,7 +40,6 @@ return new class extends Migration
                 indexName: 'lima_juz_peserta_id'
             );
             $table->timestamps();
-
         });
     }
 

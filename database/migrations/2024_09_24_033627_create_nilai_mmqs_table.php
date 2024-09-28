@@ -20,7 +20,6 @@ return new class extends Migration
             $table->float('logika_dan_organisasi_pesan')->nullable();
             $table->float('bobot_logika_dan_organisasi_pesan')->nullable();
             $table->float('presentasi')->nullable();
-            $table->float('bobot_presentasi')->nullable();
             $table->float('total')->nullable();
             $table->float('bobot_total')->nullable();
             $table->float('final_bobot')->nullable();
