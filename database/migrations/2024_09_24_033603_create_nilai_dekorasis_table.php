@@ -13,13 +13,15 @@ return new class extends Migration
     {
         Schema::create('nilai_dekorasis', function (Blueprint $table) {
             $table->id();
-            $table->decimal('kebenaran_kaidah_khath', 2, 2)->nullable();
-            $table->decimal('max_kebenaran_kaidah_khath', 2, 2)->nullable();
-            $table->decimal('unsur_seni_rupa', 2, 2)->nullable();
-            $table->decimal('max_unsur_seni_rupa', 2, 2)->nullable();
-            $table->decimal('sentuhan_akhir', 2, 2)->nullable();
-            $table->decimal('max_sentuhan_akhir', 2, 2)->nullable();
-            $table->decimal('total', 4, 2)->nullable();
+            $table->float('kebenaran_kaidah_khath')->nullable();
+            $table->float('bobot_kebenaran_kaidah_khath')->nullable();
+            $table->float('keindahan_khat')->nullable();
+            $table->float('bobot_keindahan_khat')->nullable();
+            $table->float('sentuhan_akhir')->nullable();
+            $table->float('bobot_sentuhan_akhir')->nullable();
+            $table->float('total')->nullable();
+            $table->float('bobot_total')->nullable();
+            $table->float('final_bobot')->nullable();
             $table->foreignId('peserta_id')->constrained(
                 table: 'pesertas',
                 indexName: 'mkq_peserta_id'

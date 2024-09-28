@@ -13,13 +13,15 @@ return new class extends Migration
     {
         Schema::create('nilai_msqs', function (Blueprint $table) {
             $table->id();
-            $table->decimal('terjemahan_dan_penghayatan', 2, 2)->nullable();
-            $table->decimal('max_terjemahan_dan_penghayatan', 2, 2)->nullable();
-            $table->decimal('penghayatan_dan_retorika', 2, 2)->nullable();
-            $table->decimal('max_penghayatan_dan_retorika', 2, 2)->nullable();
-            $table->decimal('tilawah', 2, 2)->nullable();
-            $table->decimal('max_tilawah', 2, 2)->nullable();
-            $table->decimal('total', 4, 2)->nullable();
+            $table->float('terjemahan_dan_penghayatan')->nullable();
+            $table->float('bobot_terjemahan_dan_penghayatan')->nullable();
+            $table->float('penghayatan_dan_retorika')->nullable();
+            $table->float('bobot_penghayatan_dan_retorika')->nullable();
+            $table->float('tilawah')->nullable();
+            $table->float('bobot_tilawah')->nullable();
+            $table->float('total')->nullable();
+            $table->float('bobot_total')->nullable();
+            $table->float('final_bobot')->nullable();
             $table->foreignId('peserta_id')->constrained(
                 table: 'pesertas',
                 indexName: 'msq_peserta_id'

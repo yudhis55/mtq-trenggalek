@@ -13,13 +13,15 @@ return new class extends Migration
     {
         Schema::create('nilai_mushafs', function (Blueprint $table) {
             $table->id();
-            $table->decimal('kebenaran_kaidah_khat', 2, 2)->nullable();
-            $table->decimal('max_kebenaran_kaidah_khat', 2, 2)->nullable();
-            $table->decimal('keindahan_khat', 2, 2)->nullable();
-            $table->decimal('max_keindahan_khat', 2, 2)->nullable();
-            $table->decimal('keindahan_hiasan_dan_lukisan', 2, 2)->nullable();
-            $table->decimal('max_keindahan_hiasan_dan_lukisan', 2, 2)->nullable();
-            $table->decimal('total', 4, 2)->nullable();
+            $table->float('kebenaran_kaidah_khat')->nullable();
+            $table->float('bobot_kebenaran_kaidah_khat')->nullable();
+            $table->float('keindahan_khat')->nullable();
+            $table->float('bobot_keindahan_khat')->nullable();
+            $table->float('keindahan_hiasan_dan_lukisan')->nullable();
+            $table->float('bobot_keindahan_hiasan_dan_lukisan')->nullable();
+            $table->float('total')->nullable();
+            $table->float('bobot_total')->nullable();
+            $table->float('final_bobot')->nullable();
             $table->foreignId('peserta_id')->constrained(
                 table: 'pesertas',
                 indexName: 'mushaf_peserta_id'

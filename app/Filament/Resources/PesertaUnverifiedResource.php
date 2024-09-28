@@ -21,6 +21,8 @@ class PesertaUnverifiedResource extends Resource
 {
     protected static ?string $model = Peserta::class;
 
+    protected static ?int $navigationSort = 52;
+
     protected static ?string $navigationLabel = 'Belum Diterima';
 
     protected static ?string $navigationIcon = 'heroicon-o-x-circle';
@@ -49,17 +51,19 @@ class PesertaUnverifiedResource extends Resource
                     ->rowIndex(),
                 TextColumn::make('nik'),
                 TextColumn::make('nama'),
+                TextColumn::make('tempat_dan_tanggal_lahir')
+                    ->label('Tempat, Tanggal Lahir'),
                 TextColumn::make('alamat_ktp')
                     ->wrap(),
                 IconColumn::make('is_verified')
                     ->label('Diterima')
-                    ->boolean()
-                    ->action(function ($record, $column) {
-                        $name = $column->getName();
-                        $record->update([
-                            $name => !$record->$name
-                        ]);
-                    }),
+                    ->boolean(),
+                    // ->action(function ($record, $column) {
+                    //     $name = $column->getName();
+                    //     $record->update([
+                    //         $name => !$record->$name
+                    //     ]);
+                    // }),
             ])
             ->filters([
                 //

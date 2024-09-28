@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('nilai_mfqs', function (Blueprint $table) {
             $table->id();
-            $table->decimal('total',4,2)->nullable();
+            $table->float('total')->nullable();
             $table->foreignId('peserta_id')->constrained(
                 table: 'pesertas',
                 indexName: 'mfq_peserta_id'

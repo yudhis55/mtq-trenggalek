@@ -23,6 +23,8 @@ class PesertaVerifiedResource extends Resource
 {
     protected static ?string $model = Peserta::class;
 
+    protected static ?int $navigationSort = 53;
+
     protected static ?string $navigationLabel = 'Diterima';
 
     protected static ?string $navigationGroup = 'Manajemen Peserta';
@@ -57,13 +59,13 @@ class PesertaVerifiedResource extends Resource
                     ->wrap(),
                 IconColumn::make('is_verified')
                     ->label('Diterima')
-                    ->boolean()
-                    ->action(function ($record, $column) {
-                        $name = $column->getName();
-                        $record->update([
-                            $name => !$record->$name
-                        ]);
-                    }),
+                    ->boolean(),
+                    // ->action(function ($record, $column) {
+                    //     $name = $column->getName();
+                    //     $record->update([
+                    //         $name => !$record->$name
+                    //     ]);
+                    // }),
             ])
             ->filters([
                 //

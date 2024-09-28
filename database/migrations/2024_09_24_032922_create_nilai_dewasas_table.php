@@ -13,15 +13,16 @@ return new class extends Migration
     {
         Schema::create('nilai_dewasas', function (Blueprint $table) {
             $table->id();
-            $table->decimal('tajwid', 2, 2)->nullable();
-            $table->decimal('max_tajwid', 2, 2)->nullable();
-            $table->decimal('lagu', 2, 2)->nullable();
-            $table->decimal('max_lagu', 2, 2)->nullable();
-            $table->decimal('fashahah', 2, 2)->nullable();
-            $table->decimal('max_fashahah', 2, 2)->nullable();
-            $table->decimal('suara', 2, 2)->nullable();
-            $table->decimal('max_suara', 2, 2)->nullable();
-            $table->decimal('total', 4, 2)->nullable();
+            $table->float('tajwid')->nullable();
+            $table->float('bobot_tajwid')->nullable();
+            $table->float('lagu')->nullable();
+            $table->float('bobot_lagu')->nullable();
+            $table->float('fashahah')->nullable();
+            $table->float('bobot_fashahah')->nullable();
+            $table->float('suara')->nullable();
+            $table->float('total')->nullable();
+            $table->float('bobot_total')->nullable();
+            $table->float('final_bobot')->nullable();
             $table->foreignId('peserta_id')->constrained(
                 table: 'pesertas',
                 indexName: 'dewasa_peserta_id'

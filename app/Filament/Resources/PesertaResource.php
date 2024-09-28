@@ -49,6 +49,8 @@ class PesertaResource extends Resource
 {
     protected static ?string $model = Peserta::class;
 
+    protected static ?int $navigationSort = 51;
+
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
 
     protected static ?string $navigationLabel = 'Peserta';
@@ -337,7 +339,8 @@ class PesertaResource extends Resource
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('jenis_kelamin')
                     ->label(__('L/P'))
-                    ->toggleable(),
+                    ->toggleable()
+                    ->formatStateUsing(fn (Peserta $record): string => $record->jenis_kelamin == 'putra' ? 'L' : 'P'),
                 Tables\Columns\TextColumn::make('tempat_lahir')
                     ->label(__('Tempat Lahir'))
                     ->searchable()
@@ -371,10 +374,171 @@ class PesertaResource extends Resource
                             if (in_array($record->cabang_id, [1, 2])) {
                                 // Tambahkan data baru di tabel nilai_tartils
                                 \App\Models\NilaiTartil::create([
-                                    'tajwid' => null,
-                                    'irama_dan_suara' => null,
-                                    'fashahah' => null,
-                                    'total' => null,
+                                    'peserta_id' => $record->id,
+                                ]);
+                                Notification::make()
+                                    ->title('Verifikasi Berhasil')
+                                    ->body('Peserta ' . $record->nama . ' berhasil diverifikasi')
+                                    ->success()
+                                    ->send();
+                            }
+                            if (in_array($record->cabang_id, [3, 4])) {
+                                // Tambahkan data baru di tabel nilai_tartils
+                                \App\Models\NilaiAnak::create([
+                                    'peserta_id' => $record->id,
+                                ]);
+                                Notification::make()
+                                    ->title('Verifikasi Berhasil')
+                                    ->body('Peserta ' . $record->nama . ' berhasil diverifikasi')
+                                    ->success()
+                                    ->send();
+                            }
+                            if (in_array($record->cabang_id, [5, 6])) {
+                                // Tambahkan data baru di tabel nilai_tartils
+                                \App\Models\NilaiRemaja::create([
+                                    'peserta_id' => $record->id,
+                                ]);
+                                Notification::make()
+                                    ->title('Verifikasi Berhasil')
+                                    ->body('Peserta ' . $record->nama . ' berhasil diverifikasi')
+                                    ->success()
+                                    ->send();
+                            }
+                            if (in_array($record->cabang_id, [7, 8])) {
+                                // Tambahkan data baru di tabel nilai_tartils
+                                \App\Models\NilaiDewasa::create([
+                                    'peserta_id' => $record->id,
+                                ]);
+                                Notification::make()
+                                    ->title('Verifikasi Berhasil')
+                                    ->body('Peserta ' . $record->nama . ' berhasil diverifikasi')
+                                    ->success()
+                                    ->send();
+                            }
+                            if (in_array($record->cabang_id, [9, 10])) {
+                                // Tambahkan data baru di tabel nilai_tartils
+                                \App\Models\NilaiSatuJuz::create([
+                                    'peserta_id' => $record->id,
+                                ]);
+                                Notification::make()
+                                    ->title('Verifikasi Berhasil')
+                                    ->body('Peserta ' . $record->nama . ' berhasil diverifikasi')
+                                    ->success()
+                                    ->send();
+                            }
+                            if (in_array($record->cabang_id, [11, 12])) {
+                                // Tambahkan data baru di tabel nilai_tartils
+                                \App\Models\NilaiLimaJuz::create([
+                                    'peserta_id' => $record->id,
+                                ]);
+                                Notification::make()
+                                    ->title('Verifikasi Berhasil')
+                                    ->body('Peserta ' . $record->nama . ' berhasil diverifikasi')
+                                    ->success()
+                                    ->send();
+                            }
+                            if (in_array($record->cabang_id, [13, 14])) {
+                                // Tambahkan data baru di tabel nilai_tartils
+                                \App\Models\NilaiSepuluhJuz::create([
+                                    'peserta_id' => $record->id,
+                                ]);
+                                Notification::make()
+                                    ->title('Verifikasi Berhasil')
+                                    ->body('Peserta ' . $record->nama . ' berhasil diverifikasi')
+                                    ->success()
+                                    ->send();
+                            }
+                            if (in_array($record->cabang_id, [15, 16])) {
+                                // Tambahkan data baru di tabel nilai_tartils
+                                \App\Models\NilaiDuapuluhJuz::create([
+                                    'peserta_id' => $record->id,
+                                ]);
+                                Notification::make()
+                                    ->title('Verifikasi Berhasil')
+                                    ->body('Peserta ' . $record->nama . ' berhasil diverifikasi')
+                                    ->success()
+                                    ->send();
+                            }
+                            if (in_array($record->cabang_id, [17, 18])) {
+                                // Tambahkan data baru di tabel nilai_tartils
+                                \App\Models\NilaiTigapuluhJuz::create([
+                                    'peserta_id' => $record->id,
+                                ]);
+                                Notification::make()
+                                    ->title('Verifikasi Berhasil')
+                                    ->body('Peserta ' . $record->nama . ' berhasil diverifikasi')
+                                    ->success()
+                                    ->send();
+                            }
+                            if (in_array($record->cabang_id, [19, 20])) {
+                                // Tambahkan data baru di tabel nilai_tartils
+                                \App\Models\NilaiMfq::create([
+                                    'peserta_id' => $record->id,
+                                ]);
+                                Notification::make()
+                                    ->title('Verifikasi Berhasil')
+                                    ->body('Peserta ' . $record->nama . ' berhasil diverifikasi')
+                                    ->success()
+                                    ->send();
+                            }
+                            if (in_array($record->cabang_id, [21, 22])) {
+                                // Tambahkan data baru di tabel nilai_tartils
+                                \App\Models\NilaiMsq::create([
+                                    'peserta_id' => $record->id,
+                                ]);
+                                Notification::make()
+                                    ->title('Verifikasi Berhasil')
+                                    ->body('Peserta ' . $record->nama . ' berhasil diverifikasi')
+                                    ->success()
+                                    ->send();
+                            }
+                            if (in_array($record->cabang_id, [23, 24])) {
+                                // Tambahkan data baru di tabel nilai_tartils
+                                \App\Models\NilaiNaskah::create([
+                                    'peserta_id' => $record->id,
+                                ]);
+                                Notification::make()
+                                    ->title('Verifikasi Berhasil')
+                                    ->body('Peserta ' . $record->nama . ' berhasil diverifikasi')
+                                    ->success()
+                                    ->send();
+                            }
+                            if (in_array($record->cabang_id, [25, 26])) {
+                                // Tambahkan data baru di tabel nilai_tartils
+                                \App\Models\NilaiMushaf::create([
+                                    'peserta_id' => $record->id,
+                                ]);
+                                Notification::make()
+                                    ->title('Verifikasi Berhasil')
+                                    ->body('Peserta ' . $record->nama . ' berhasil diverifikasi')
+                                    ->success()
+                                    ->send();
+                            }
+                            if (in_array($record->cabang_id, [27, 28])) {
+                                // Tambahkan data baru di tabel nilai_tartils
+                                \App\Models\NilaiDekorasi::create([
+                                    'peserta_id' => $record->id,
+                                ]);
+                                Notification::make()
+                                    ->title('Verifikasi Berhasil')
+                                    ->body('Peserta ' . $record->nama . ' berhasil diverifikasi')
+                                    ->success()
+                                    ->send();
+                            }
+                            if (in_array($record->cabang_id, [29, 30])) {
+                                // Tambahkan data baru di tabel nilai_tartils
+                                \App\Models\NilaiKontemporer::create([
+                                    'peserta_id' => $record->id,
+                                ]);
+                                Notification::make()
+                                    ->title('Verifikasi Berhasil')
+                                    ->body('Peserta ' . $record->nama . ' berhasil diverifikasi')
+                                    ->success()
+                                    ->send();
+                            }
+                            if (in_array($record->cabang_id, [31, 32])) {
+                                // Tambahkan data baru di tabel nilai_tartils
+                                \App\Models\NilaiMmq::create([
                                     'peserta_id' => $record->id,
                                 ]);
                                 Notification::make()
@@ -386,9 +550,70 @@ class PesertaResource extends Resource
                         } else {
                             // Jika membatalkan verifikasi, pastikan total null atau 0
                             $nilaiTartil = \App\Models\NilaiTartil::where('peserta_id', $record->id)->first();
+                            $nilaiAnak = \App\Models\NilaiAnak::where('peserta_id', $record->id)->first();
+                            $nilaiRemaja = \App\Models\NilaiRemaja::where('peserta_id', $record->id)->first();
+                            $nilaiDewasa = \App\Models\NilaiDewasa::where('peserta_id', $record->id)->first();
+                            $nilaiSatuJuz = \App\Models\NilaiSatuJuz::where('peserta_id', $record->id)->first();
+                            $nilaiLimaJuz = \App\Models\NilaiLimaJuz::where('peserta_id', $record->id)->first();
+                            $nilaiSepuluhJuz = \App\Models\NilaiSepuluhJuz::where('peserta_id', $record->id)->first();
+                            $nilaiDuapuluhJuz = \App\Models\NilaiDuapuluhJuz::where('peserta_id', $record->id)->first();
+                            $nilaiTigapuluhJuz = \App\Models\NilaiTigapuluhJuz::where('peserta_id', $record->id)->first();
+                            $nilaiMfq = \App\Models\NilaiMfq::where('peserta_id', $record->id)->first();
+                            $nilaiMsq = \App\Models\NilaiMsq::where('peserta_id', $record->id)->first();
+                            $nilaiNaskah = \App\Models\NilaiNaskah::where('peserta_id', $record->id)->first();
+                            $nilaiMushaf = \App\Models\NilaiMushaf::where('peserta_id', $record->id)->first();
+                            $nilaiDekorasi = \App\Models\NilaiDekorasi::where('peserta_id', $record->id)->first();
+                            $nilaiKontemporer = \App\Models\NilaiKontemporer::where('peserta_id', $record->id)->first();
+                            $nilaiMmq = \App\Models\NilaiMmq::where('peserta_id', $record->id)->first();
+
                             if ($nilaiTartil && ($nilaiTartil->total === null || $nilaiTartil->total == 0)) {
                                 // Hapus data jika memenuhi syarat
                                 $nilaiTartil->delete();
+                            } elseif ($nilaiAnak && ($nilaiAnak->total === null || $nilaiAnak->total == 0)) {
+                                // Hapus data jika memenuhi syarat
+                                $nilaiAnak->delete();
+                            } elseif ($nilaiRemaja && ($nilaiRemaja->total === null || $nilaiRemaja->total == 0)) {
+                                // Hapus data jika memenuhi syarat
+                                $nilaiRemaja->delete();
+                            } elseif ($nilaiDewasa && ($nilaiDewasa->total === null || $nilaiDewasa->total == 0)) {
+                                // Hapus data jika memenuhi syarat
+                                $nilaiDewasa->delete();
+                            } elseif ($nilaiSatuJuz && ($nilaiSatuJuz->total === null || $nilaiSatuJuz->total == 0)) {
+                                // Hapus data jika memenuhi syarat
+                                $nilaiSatuJuz->delete();
+                            } elseif ($nilaiLimaJuz && ($nilaiLimaJuz->total === null || $nilaiLimaJuz->total == 0)) {
+                                // Hapus data jika memenuhi syarat
+                                $nilaiLimaJuz->delete();
+                            } elseif ($nilaiSepuluhJuz && ($nilaiSepuluhJuz->total === null || $nilaiSepuluhJuz->total == 0)) {
+                                // Hapus data jika memenuhi syarat
+                                $nilaiSepuluhJuz->delete();
+                            } elseif ($nilaiDuapuluhJuz && ($nilaiDuapuluhJuz->total === null || $nilaiDuapuluhJuz->total == 0)) {
+                                // Hapus data jika memenuhi syarat
+                                $nilaiDuapuluhJuz->delete();
+                            } elseif ($nilaiTigapuluhJuz && ($nilaiTigapuluhJuz->total === null || $nilaiTigapuluhJuz->total == 0)) {
+                                // Hapus data jika memenuhi syarat
+                                $nilaiTigapuluhJuz->delete();
+                            } elseif ($nilaiMfq && ($nilaiMfq->total === null || $nilaiMfq->total == 0)) {
+                                // Hapus data jika memenuhi syarat
+                                $nilaiMfq->delete();
+                            } elseif ($nilaiMsq && ($nilaiMsq->total === null || $nilaiMsq->total == 0)) {
+                                // Hapus data jika memenuhi syarat
+                                $nilaiMsq->delete();
+                            } elseif ($nilaiNaskah && ($nilaiNaskah->total === null || $nilaiNaskah->total == 0)) {
+                                // Hapus data jika memenuhi syarat
+                                $nilaiNaskah->delete();
+                            } elseif ($nilaiMushaf && ($nilaiMushaf->total === null || $nilaiMushaf->total == 0)) {
+                                // Hapus data jika memenuhi syarat
+                                $nilaiMushaf->delete();
+                            } elseif ($nilaiDekorasi && ($nilaiDekorasi->total === null || $nilaiDekorasi->total == 0)) {
+                                // Hapus data jika memenuhi syarat
+                                $nilaiDekorasi->delete();
+                            } elseif ($nilaiKontemporer && ($nilaiKontemporer->total === null || $nilaiKontemporer->total == 0)) {
+                                // Hapus data jika memenuhi syarat
+                                $nilaiKontemporer->delete();
+                            } elseif ($nilaiMmq && ($nilaiMmq->total === null || $nilaiMmq->total == 0)) {
+                                // Hapus data jika memenuhi syarat
+                                $nilaiMmq->delete();
                             } else {
                                 // Mungkin tambahkan notifikasi bahwa penghapusan gagal
                                 // return back()->with('error', 'Gagal membatalkan verifikasi: total tidak null atau tidak 0.');
@@ -399,17 +624,17 @@ class PesertaResource extends Resource
                                     ->send();
                             }
                             Notification::make()
-                                    ->title('Pembatalan Verifikasi Berhasil')
-                                    ->body('Pembatalan verifikasi peserta ' . $record->nama . ' berhasil dilakukan')
-                                    ->success()
-                                    ->send();
+                                ->title('Pembatalan Verifikasi Berhasil')
+                                ->body('Pembatalan verifikasi peserta ' . $record->nama . ' berhasil dilakukan')
+                                ->success()
+                                ->send();
                         }
 
                         // Update status verifikasi
                         $record->update([$name => $isVerified]);
                     })
                     ->toggleable(),
-                // Tables\Columns\TextColumn::make('tahun.tahun')
+                Tables\Columns\TextColumn::make('tahun.tahun')
             ])
             ->filters([
                 SelectFilter::make('utusan.kecamatan')

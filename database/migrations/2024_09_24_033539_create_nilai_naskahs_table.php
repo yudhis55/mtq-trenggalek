@@ -13,15 +13,16 @@ return new class extends Migration
     {
         Schema::create('nilai_naskahs', function (Blueprint $table) {
             $table->id();
-            $table->decimal('kebenaran_kaidah_khat_wajib', 2, 2)->nullable();
-            $table->decimal('max_kebenaran_kaidah_khat_wajib', 2, 2)->nullable();
-            $table->decimal('keindahan_khat_wajib', 2, 2)->nullable();
-            $table->decimal('max_keindahan_khat_wajib', 2, 2)->nullable();
-            $table->decimal('kebenaran_kaidah_khat_pilihan', 2, 2)->nullable();
-            $table->decimal('max_kebenaran_kaidah_khat_pilihan', 2, 2)->nullable();
-            $table->decimal('keindahan_khat_pilihan', 2, 2)->nullable();
-            $table->decimal('max_keindahan_khat_pilihan', 2, 2)->nullable();
-            $table->decimal('total', 4, 2)->nullable();
+            $table->float('kebenaran_kaidah_khat_wajib')->nullable();
+            $table->float('bobot_kebenaran_kaidah_khat_wajib')->nullable();
+            $table->float('keindahan_khat_wajib')->nullable();
+            $table->float('bobot_keindahan_khat_wajib')->nullable();
+            $table->float('kebenaran_kaidah_khat_pilihan')->nullable();
+            $table->float('bobot_kebenaran_kaidah_khat_pilihan')->nullable();
+            $table->float('keindahan_khat_pilihan')->nullable();
+            $table->float('total')->nullable();
+            $table->float('bobot_total')->nullable();
+            $table->float('final_bobot')->nullable();
             $table->foreignId('peserta_id')->constrained(
                 table: 'pesertas',
                 indexName: 'naskah_peserta_id'

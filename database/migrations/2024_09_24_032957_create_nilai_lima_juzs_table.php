@@ -13,28 +13,33 @@ return new class extends Migration
     {
         Schema::create('nilai_lima_juzs', function (Blueprint $table) {
             $table->id();
-            $table->decimal('til_tajwid', 2, 2)->nullable();
-            $table->decimal('max_til_tajwid', 2, 2)->nullable();
-            $table->decimal('til_lagu', 2, 2)->nullable();
-            $table->decimal('max_til_lagu', 2, 2)->nullable();
-            $table->decimal('til_suara', 2, 2)->nullable();
-            $table->decimal('max_til_suara', 2, 2)->nullable();
-            $table->decimal('til_fashahah', 2, 2)->nullable();
-            $table->decimal('max_til_fashahah', 2, 2)->nullable();
-            $table->decimal('tah_tahfizh', 2, 2)->nullable();
-            $table->decimal('max_tah_tahfizh', 2, 2)->nullable();
-            $table->decimal('tah_tajwid', 2, 2)->nullable();
-            $table->decimal('max_tah_tajwid', 2, 2)->nullable();
-            $table->decimal('tah_fashahah', 2, 2)->nullable();
-            $table->decimal('max_tah_fashahah', 2, 2)->nullable();
-            $table->decimal('total_tilawah', 4, 2)->nullable();
-            $table->decimal('total_tahfizh', 4, 2)->nullable();
-            $table->decimal('total', 4, 2)->nullable();
+            $table->float('til_tajwid')->nullable();
+            $table->float('bobot_til_tajwid')->nullable();
+            $table->float('til_lagu')->nullable();
+            $table->float('bobot_til_lagu')->nullable();
+            $table->float('til_suara')->nullable();
+            $table->float('bobot_til_suara')->nullable();
+            $table->float('til_fashahah')->nullable();
+            $table->float('bobot_til_fashahah')->nullable();
+            $table->float('tah_tahfizh')->nullable();
+            $table->float('bobot_tah_tahfizh')->nullable();
+            $table->float('tah_tajwid')->nullable();
+            $table->float('bobot_tah_tajwid')->nullable();
+            $table->float('tah_fashahah')->nullable();
+            $table->float('bobot_tah_fashahah')->nullable();
+            $table->float('total_tilawah')->nullable();
+            $table->float('bobot_tilawah')->nullable();
+            $table->float('total_tahfizh')->nullable();
+            $table->float('bobot_tahfizh')->nullable();
+            $table->float('total')->nullable();
+            $table->float('bobot_total')->nullable();
+            $table->float('final_bobot')->nullable();
             $table->foreignId('peserta_id')->constrained(
                 table: 'pesertas',
                 indexName: 'lima_juz_peserta_id'
             );
             $table->timestamps();
+
         });
     }
 
