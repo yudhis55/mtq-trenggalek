@@ -11,13 +11,17 @@ use App\Models\NilaiKontemporer;
 use Filament\Resources\Resource;
 use Illuminate\Support\HtmlString;
 use Filament\Forms\Components\Split;
+use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Section;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
+use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
 use App\Filament\Penilaian\Resources\NilaiKontemporerResource\Pages;
 use App\Filament\Penilaian\Resources\NilaiKontemporerResource\RelationManagers;
 
@@ -26,8 +30,6 @@ class NilaiKontemporerResource extends Resource
     protected static ?string $model = NilaiKontemporer::class;
 
     protected static ?int $navigationSort = 5;
-
-    protected static ?string $navigationGroup = 'Penilaian';
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
@@ -120,7 +122,8 @@ class NilaiKontemporerResource extends Resource
                     ->label('No')
                     ->rowIndex(),
                 TextColumn::make('peserta.nama')
-                    ->label('Nama'),
+                    ->label('Nama')
+                    ->searchable(),
                 TextColumn::make('peserta.jenis_kelamin')
                     ->label('Jenis Kelamin'),
                 TextColumn::make('peserta.utusan.kecamatan'),
@@ -131,7 +134,37 @@ class NilaiKontemporerResource extends Resource
             ])
             ->defaultSort('final_bobot', 'desc')
             ->filters([
+                SelectFilter::make('peserta.jenis_kelamin')
+                    ->label('Jenis Kelamin')
+                    ->options([
+                        'putra' => 'Laki-laki',
+                        'putri' => 'Perempuan',
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        $value = $data['value'] ?? null;
 
+                        if ($value === 'putra') {
+                            // Filter peserta dengan cabang Tartil Putra atau Tartil Putri
+                            return $query->whereHas('peserta', function (Builder $query) {
+                                $query->where('jenis_kelamin', 'like', '%putra%');
+                            });
+                        } elseif ($value === 'putri') {
+                            // Filter peserta dengan cabang Tilawah Anak-anak Putra atau Tilawah Anak-anak Putri
+                            return $query->whereHas('peserta', function (Builder $query) {
+                                $query->where('jenis_kelamin', 'like', '%putri%');
+                            });
+                        }
+                    }),
+            ])
+            ->headerActions([
+                // ExportAction::make()
+                //     ->label(__('Download Excel'))
+                //     ->color('success')
+                //     ->exports([
+                //         ExcelExport::make()->fromTable()->except([
+                //             'index',
+                //         ]),
+                //     ])
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
@@ -170,5 +203,10 @@ class NilaiKontemporerResource extends Resource
         return [
             'index' => Pages\ManageNilaiKontemporers::route('/'),
         ];
+    }
+
+    public static function canViewAny(): bool
+    {
+        return Auth::user()->cabang_id_satu==29 && Auth::user()->cabang_id_dua==30;
     }
 }

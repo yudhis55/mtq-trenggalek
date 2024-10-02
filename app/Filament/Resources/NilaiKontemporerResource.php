@@ -2,23 +2,27 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\NilaiKontemporerResource\Pages;
-use App\Filament\Resources\NilaiKontemporerResource\RelationManagers;
-use App\Models\NilaiKontemporer;
+use index;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Forms\Get;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Models\NilaiKontemporer;
+use Filament\Resources\Resource;
 use Illuminate\Support\HtmlString;
 use Filament\Forms\Components\Split;
 use Filament\Forms\Components\Section;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
-use Filament\Forms\Get;
+use Filament\Tables\Filters\SelectFilter;
+use Illuminate\Database\Eloquent\Builder;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
+use App\Filament\Resources\NilaiKontemporerResource\Pages;
+use App\Filament\Resources\NilaiKontemporerResource\RelationManagers;
 
 class NilaiKontemporerResource extends Resource
 {
@@ -119,9 +123,11 @@ class NilaiKontemporerResource extends Resource
                     ->label('No')
                     ->rowIndex(),
                 TextColumn::make('peserta.nama')
-                    ->label('Nama'),
+                    ->label('Nama')
+                    ->searchable(),
                 TextColumn::make('peserta.jenis_kelamin')
-                    ->label('Jenis Kelamin'),
+                    ->label('Jenis Kelamin')
+                    ->formatStateUsing(fn (NilaiKontemporer $record): string => $record->peserta->jenis_kelamin == 'putra' ? 'L' : 'P'),
                 TextColumn::make('peserta.utusan.kecamatan'),
                 TextColumn::make('unsur_kaligrafi'),
                 TextColumn::make('unsur_seni_rupa'),
@@ -130,7 +136,37 @@ class NilaiKontemporerResource extends Resource
             ])
             ->defaultSort('final_bobot', 'desc')
             ->filters([
+                SelectFilter::make('peserta.jenis_kelamin')
+                    ->label('Jenis Kelamin')
+                    ->options([
+                        'putra' => 'Laki-laki',
+                        'putri' => 'Perempuan',
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        $value = $data['value'] ?? null;
 
+                        if ($value === 'putra') {
+                            // Filter peserta dengan cabang Tartil Putra atau Tartil Putri
+                            return $query->whereHas('peserta', function (Builder $query) {
+                                $query->where('jenis_kelamin', 'like', '%putra%');
+                            });
+                        } elseif ($value === 'putri') {
+                            // Filter peserta dengan cabang Tilawah Anak-anak Putra atau Tilawah Anak-anak Putri
+                            return $query->whereHas('peserta', function (Builder $query) {
+                                $query->where('jenis_kelamin', 'like', '%putri%');
+                            });
+                        }
+                    }),
+            ])
+            ->headerActions([
+                ExportAction::make()
+                    ->label(__('Download Excel'))
+                    ->color('success')
+                    ->exports([
+                        ExcelExport::make()->fromTable()->except([
+                            'index',
+                        ]),
+                    ])
             ])
             ->actions([
                 Tables\Actions\EditAction::make()

@@ -16,10 +16,13 @@ use Filament\Forms\Components\Section;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
+use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\NilaiTartilResource\Pages;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
 use App\Filament\Resources\NilaiTartilResource\RelationManagers;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
 
 class NilaiTartilResource extends Resource
 {
@@ -124,7 +127,7 @@ class NilaiTartilResource extends Resource
                     ->searchable(),
                 TextColumn::make('peserta.jenis_kelamin')
                     ->label('L / P')
-                    ->formatStateUsing(fn (NilaiTartil $record): string => $record->peserta->jenis_kelamin == 'putra' ? 'L' : 'P'),
+                    ->formatStateUsing(fn(NilaiTartil $record): string => $record->peserta->jenis_kelamin == 'putra' ? 'L' : 'P'),
                 TextColumn::make('peserta.utusan.kecamatan'),
                 TextColumn::make('tajwid'),
                 TextColumn::make('irama_dan_suara'),
@@ -133,7 +136,37 @@ class NilaiTartilResource extends Resource
             ])
             ->defaultSort('final_bobot', 'desc')
             ->filters([
-                //
+                SelectFilter::make('peserta.jenis_kelamin')
+                    ->label('Jenis Kelamin')
+                    ->options([
+                        'putra' => 'Laki-laki',
+                        'putri' => 'Perempuan',
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        $value = $data['value'] ?? null;
+
+                        if ($value === 'putra') {
+                            // Filter peserta dengan cabang Tartil Putra atau Tartil Putri
+                            return $query->whereHas('peserta', function (Builder $query) {
+                                $query->where('jenis_kelamin', 'like', '%putra%');
+                            });
+                        } elseif ($value === 'putri') {
+                            // Filter peserta dengan cabang Tilawah Anak-anak Putra atau Tilawah Anak-anak Putri
+                            return $query->whereHas('peserta', function (Builder $query) {
+                                $query->where('jenis_kelamin', 'like', '%putri%');
+                            });
+                        }
+                    }),
+            ])
+            ->headerActions([
+                ExportAction::make()
+                    ->label(__('Download Excel'))
+                    ->color('success')
+                    ->exports([
+                        ExcelExport::make()->fromTable()->except([
+                            'index',
+                        ]),
+                    ])
             ])
             ->actions([
                 Tables\Actions\EditAction::make()

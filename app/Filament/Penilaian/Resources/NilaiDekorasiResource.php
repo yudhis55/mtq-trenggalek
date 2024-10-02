@@ -11,12 +11,16 @@ use App\Models\NilaiDekorasi;
 use Filament\Resources\Resource;
 use Illuminate\Support\HtmlString;
 use Filament\Forms\Components\Split;
+use Illuminate\Support\Facades\Auth;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
+use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Infolists\Components\Section;
 use Illuminate\Support\Facades\Notification;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use pxlrbt\FilamentExcel\Actions\Pages\ExportAction;
 use App\Filament\Penilaian\Resources\NilaiDekorasiResource\Pages;
 use App\Filament\Penilaian\Resources\NilaiDekorasiResource\RelationManagers;
 
@@ -25,8 +29,6 @@ class NilaiDekorasiResource extends Resource
     protected static ?string $model = NilaiDekorasi::class;
 
     protected static ?int $navigationSort = 5;
-
-    protected static ?string $navigationGroup = 'Penilaian';
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
@@ -119,7 +121,8 @@ class NilaiDekorasiResource extends Resource
                     ->label('No')
                     ->rowIndex(),
                 TextColumn::make('peserta.nama')
-                    ->label('Nama'),
+                    ->label('Nama')
+                    ->searchable(),
                 TextColumn::make('peserta.jenis_kelamin')
                     ->label('Jenis Kelamin'),
                 TextColumn::make('peserta.utusan.kecamatan'),
@@ -130,7 +133,37 @@ class NilaiDekorasiResource extends Resource
             ])
             ->defaultSort('final_bobot', 'desc')
             ->filters([
+                SelectFilter::make('peserta.jenis_kelamin')
+                    ->label('Jenis Kelamin')
+                    ->options([
+                        'putra' => 'Laki-laki',
+                        'putri' => 'Perempuan',
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        $value = $data['value'] ?? null;
 
+                        if ($value === 'putra') {
+                            // Filter peserta dengan cabang Tartil Putra atau Tartil Putri
+                            return $query->whereHas('peserta', function (Builder $query) {
+                                $query->where('jenis_kelamin', 'like', '%putra%');
+                            });
+                        } elseif ($value === 'putri') {
+                            // Filter peserta dengan cabang Tilawah Anak-anak Putra atau Tilawah Anak-anak Putri
+                            return $query->whereHas('peserta', function (Builder $query) {
+                                $query->where('jenis_kelamin', 'like', '%putri%');
+                            });
+                        }
+                    }),
+            ])
+            ->headerActions([
+                // ExportAction::make()
+                //     ->label(__('Download Excel'))
+                //     ->color('success')
+                //     ->exports([
+                //         ExcelExport::make()->fromTable()->except([
+                //             'index',
+                //         ]),
+                //     ])
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
@@ -169,5 +202,10 @@ class NilaiDekorasiResource extends Resource
         return [
             'index' => Pages\ManageNilaiDekorasis::route('/'),
         ];
+    }
+
+    public static function canViewAny(): bool
+    {
+        return Auth::user()->cabang_id_satu==27 && Auth::user()->cabang_id_dua==28;
     }
 }

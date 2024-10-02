@@ -10,16 +10,20 @@ use Filament\Tables\Table;
 use App\Models\NilaiSepuluhJuz;
 use Filament\Resources\Resource;
 use Illuminate\Support\HtmlString;
+use Filament\Forms\Components\Split;
+use Illuminate\Support\Facades\Auth;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Section;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Split;
+use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Notification;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use pxlrbt\FilamentExcel\Actions\Pages\ExportAction;
 use App\Filament\Penilaian\Resources\NilaiSepuluhJuzResource\Pages;
 use App\Filament\Penilaian\Resources\NilaiSepuluhJuzResource\RelationManagers;
-use Filament\Forms\Components\Select;
 
 
 
@@ -29,8 +33,6 @@ class NilaiSepuluhJuzResource extends Resource
     protected static ?string $model = NilaiSepuluhJuz::class;
 
     protected static ?int $navigationSort = 5;
-
-    protected static ?string $navigationGroup = 'Penilaian';
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
@@ -123,7 +125,8 @@ class NilaiSepuluhJuzResource extends Resource
                     ->label('No')
                     ->rowIndex(),
                 TextColumn::make('peserta.nama')
-                    ->label('Nama'),
+                    ->label('Nama')
+                    ->searchable(),
                 TextColumn::make('peserta.jenis_kelamin')
                     ->label('Jenis Kelamin'),
                 TextColumn::make('peserta.utusan.kecamatan'),
@@ -134,7 +137,37 @@ class NilaiSepuluhJuzResource extends Resource
             ])
             ->defaultSort('final_bobot', 'desc')
             ->filters([
+                SelectFilter::make('peserta.jenis_kelamin')
+                    ->label('Jenis Kelamin')
+                    ->options([
+                        'putra' => 'Laki-laki',
+                        'putri' => 'Perempuan',
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        $value = $data['value'] ?? null;
 
+                        if ($value === 'putra') {
+                            // Filter peserta dengan cabang Tartil Putra atau Tartil Putri
+                            return $query->whereHas('peserta', function (Builder $query) {
+                                $query->where('jenis_kelamin', 'like', '%putra%');
+                            });
+                        } elseif ($value === 'putri') {
+                            // Filter peserta dengan cabang Tilawah Anak-anak Putra atau Tilawah Anak-anak Putri
+                            return $query->whereHas('peserta', function (Builder $query) {
+                                $query->where('jenis_kelamin', 'like', '%putri%');
+                            });
+                        }
+                    }),
+            ])
+            ->headerActions([
+                // ExportAction::make()
+                //     ->label(__('Download Excel'))
+                //     ->color('success')
+                //     ->exports([
+                //         ExcelExport::make()->fromTable()->except([
+                //             'index',
+                //         ]),
+                //     ])
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
@@ -149,17 +182,20 @@ class NilaiSepuluhJuzResource extends Resource
                     })
                     ->modalHeading('Input Nilai')
                     ->modalDescription('Pastikan input nilai sudah sesuai, karena tidak bisa diubah')
-                    ->hidden(fn ($record): bool => $record->total != 0 && $record->total != null &&
-                        $record->tahfizh != 0 && $record->tahfizh != null &&
-                        $record->tajwid != 0 && $record->tajwid != null &&
-                        $record->fashahah != 0 && $record->fashahah != null
+                    ->hidden(
+                        fn($record): bool => $record->total != 0 && $record->total != null &&
+                            $record->tahfizh != 0 && $record->tahfizh != null &&
+                            $record->tajwid != 0 && $record->tajwid != null &&
+                            $record->fashahah != 0 && $record->fashahah != null
                     ),
                 Tables\Actions\ViewAction::make()
                     ->label('Lihat Nilai')
-                    ->hidden(fn ($record): bool => $record->total == 0 || $record->total == null ||
-                        $record->tahfizh == 0 || $record->tahfizh == null ||
-                        $record->tajwid == 0 || $record->tajwid == null ||
-                        $record->fashahah == 0 || $record->fashahah == null),
+                    ->hidden(
+                        fn($record): bool => $record->total == 0 || $record->total == null ||
+                            $record->tahfizh == 0 || $record->tahfizh == null ||
+                            $record->tajwid == 0 || $record->tajwid == null ||
+                            $record->fashahah == 0 || $record->fashahah == null
+                    ),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -173,5 +209,10 @@ class NilaiSepuluhJuzResource extends Resource
         return [
             'index' => Pages\ManageNilaiSepuluhJuzs::route('/'),
         ];
+    }
+
+    public static function canViewAny(): bool
+    {
+        return Auth::user()->cabang_id_satu == 13 && Auth::user()->cabang_id_dua == 14;
     }
 }

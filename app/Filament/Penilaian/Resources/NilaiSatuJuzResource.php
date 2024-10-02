@@ -11,13 +11,17 @@ use App\Models\NilaiSatuJuz;
 use Filament\Resources\Resource;
 use Illuminate\Support\HtmlString;
 use Filament\Forms\Components\Split;
+use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Section;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
+use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use pxlrbt\FilamentExcel\Actions\Pages\ExportAction;
 use App\Filament\Penilaian\Resources\NilaiSatuJuzResource\Pages;
 use App\Filament\Penilaian\Resources\NilaiSatuJuzResource\RelationManagers;
 
@@ -26,8 +30,6 @@ class NilaiSatuJuzResource extends Resource
     protected static ?string $model = NilaiSatuJuz::class;
 
     protected static ?int $navigationSort = 5;
-
-    protected static ?string $navigationGroup = 'Penilaian';
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
@@ -225,7 +227,8 @@ class NilaiSatuJuzResource extends Resource
                     ->label('No')
                     ->rowIndex(),
                 TextColumn::make('peserta.nama')
-                    ->label('Nama'),
+                    ->label('Nama')
+                    ->searchable(),
                 TextColumn::make('peserta.jenis_kelamin')
                     ->label('Jenis Kelamin'),
                 TextColumn::make('peserta.utusan.kecamatan'),
@@ -242,7 +245,37 @@ class NilaiSatuJuzResource extends Resource
             ])
             ->defaultSort('final_bobot', 'desc')
             ->filters([
+                SelectFilter::make('peserta.jenis_kelamin')
+                    ->label('Jenis Kelamin')
+                    ->options([
+                        'putra' => 'Laki-laki',
+                        'putri' => 'Perempuan',
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        $value = $data['value'] ?? null;
 
+                        if ($value === 'putra') {
+                            // Filter peserta dengan cabang Tartil Putra atau Tartil Putri
+                            return $query->whereHas('peserta', function (Builder $query) {
+                                $query->where('jenis_kelamin', 'like', '%putra%');
+                            });
+                        } elseif ($value === 'putri') {
+                            // Filter peserta dengan cabang Tilawah Anak-anak Putra atau Tilawah Anak-anak Putri
+                            return $query->whereHas('peserta', function (Builder $query) {
+                                $query->where('jenis_kelamin', 'like', '%putri%');
+                            });
+                        }
+                    }),
+            ])
+            ->headerActions([
+                // ExportAction::make()
+                //     ->label(__('Download Excel'))
+                //     ->color('success')
+                //     ->exports([
+                //         ExcelExport::make()->fromTable()->except([
+                //             'index',
+                //         ]),
+                //     ])
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
@@ -262,15 +295,21 @@ class NilaiSatuJuzResource extends Resource
                         $record->til_tajwid != 0 && $record->til_tajwid != null &&
                         $record->til_lagu != 0 && $record->til_lagu != null &&
                         $record->til_suara != 0 && $record->til_suara != null &&
-                        $record->til_fashahah != 0 && $record->til_fashahah != null
+                        $record->til_fashahah != 0 && $record->til_fashahah != null &&
+                        $record->tah_tahfizh != 0 && $record->tah_tahfizh != null &&
+                        $record->tah_tajwid != 0 && $record->tah_tajwid != null &&
+                        $record->tah_fashahah != 0 && $record->tah_fashahah != null
                     ),
                 Tables\Actions\ViewAction::make()
                     ->label('Lihat Nilai')
                     ->hidden(fn ($record): bool => $record->total_tilawah == 0 || $record->total_tilawah == null ||
                         $record->til_tajwid == 0 || $record->til_tajwid == null ||
                         $record->til_lagu == 0 || $record->til_lagu == null ||
-                        $record->til_suara == 0 || $record->til_suara == null
-                        && $record->til_fashahah != 0 && $record->til_fashahah != null
+                        $record->til_suara == 0 || $record->til_suara == null ||
+                        $record->til_fashahah == 0 && $record->til_fashahah == null ||
+                        $record->tah_tahfizh == 0 || $record->tah_tahfizh == null ||
+                        $record->tah_tajwid == 0 || $record->tah_tajwid == null ||
+                        $record->tah_fashahah == 0 || $record->tah_fashahah == null
                     ),
             ])
             ->bulkActions([
@@ -285,5 +324,10 @@ class NilaiSatuJuzResource extends Resource
         return [
             'index' => Pages\ManageNilaiSatuJuzs::route('/'),
         ];
+    }
+
+    public static function canViewAny(): bool
+    {
+        return Auth::user()->cabang_id_satu==9 && Auth::user()->cabang_id_dua==10;
     }
 }

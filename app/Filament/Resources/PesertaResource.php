@@ -36,6 +36,7 @@ use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\ImageEntry;
 use Filament\Support\Enums\VerticalAlignment;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use Illuminate\Validation\ValidationException;
 use App\Filament\Resources\PesertaResource\Pages;
 use Filament\Infolists\Components\Actions\Action;
@@ -754,9 +755,14 @@ class PesertaResource extends Resource
                     ->native(false),
             ])
             ->headerActions([
-                ExportAction::make('export')
+                ExportAction::make()
                     ->label(__('Download Excel'))
-                    ->color('success'),
+                    ->color('success')
+                    ->exports([
+                        ExcelExport::make()->fromTable()->except([
+                            'index',
+                        ]),
+                    ]),
                 Tables\Actions\CreateAction::make()
                     ->label(__('Tambah Peserta'))
                     ->icon('heroicon-o-user-plus'),
