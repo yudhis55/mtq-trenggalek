@@ -320,7 +320,9 @@ class PesertaSeeder extends Seeder
             'pasfoto' => 'jfbhjffjgkfdfjjjjkdf',
             'user_id' => 2,
             'tahun_id' => 1,
-        ]);Peserta::create([
+        ]);
+
+        Peserta::create([
             'nama' => 'geminiraka',
             'jenis_kelamin' => 'putra',
             'nik' => '7980818283848586',

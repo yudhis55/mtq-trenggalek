@@ -25,9 +25,9 @@ class PesertaVerifiedResource extends Resource
 
     protected static ?int $navigationSort = 53;
 
-    protected static ?string $navigationLabel = 'Diterima';
+    protected static ?string $navigationLabel = 'Peserta Yang Sah';
 
-    protected static ?string $navigationGroup = 'Manajemen Peserta';
+    protected static ?string $navigationGroup = 'Pendaftaran Peserta';
 
     protected static ?string $navigationIcon = 'heroicon-o-check-circle';
 

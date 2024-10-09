@@ -23,7 +23,7 @@ class CabangResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-trophy';
 
-    protected static ?string $navigationLabel = 'Cabang Lomba';
+    protected static ?string $navigationLabel = 'Cabang / Golongan';
 
     public static function getNavigationBadge(): ?string
     {

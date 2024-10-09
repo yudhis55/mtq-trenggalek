@@ -20,11 +20,11 @@ class TahunSeeder extends Seeder
             'batas_akhir' => '2024-10-09',
         ]);
 
-        Tahun::create([
-            'tahun' => '2026',
-            'is_active' => false,
-            'batas_awal' => '2026-09-09',
-            'batas_akhir' => '2026-10-09',
-        ]);
+        // Tahun::create([
+        //     'tahun' => '2026',
+        //     'is_active' => false,
+        //     'batas_awal' => '2026-09-09',
+        //     'batas_akhir' => '2026-10-09',
+        // ]);
     }
 }

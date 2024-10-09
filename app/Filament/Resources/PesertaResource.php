@@ -5,12 +5,14 @@ namespace App\Filament\Resources;
 use Closure;
 use Carbon\Carbon;
 use Filament\Forms;
+use App\Models\Grup;
 use Filament\Tables;
 use App\Models\Tahun;
 use App\Models\Cabang;
 use App\Models\Peserta;
 use Filament\Forms\Get;
 use Filament\Forms\Form;
+use Filament\Tables\Columns\TextInputColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
 use PhpParser\Node\Stmt\Label;
@@ -34,6 +36,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
+use EightyNine\ExcelImport\ExcelImportAction;
 use Filament\Infolists\Components\ImageEntry;
 use Filament\Support\Enums\VerticalAlignment;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
@@ -54,9 +57,9 @@ class PesertaResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
 
-    protected static ?string $navigationLabel = 'Peserta';
+    protected static ?string $navigationLabel = 'Jumlah Pendaftar';
 
-    protected static ?string $navigationGroup = 'Manajemen Peserta';
+    protected static ?string $navigationGroup = 'Pendaftaran Peserta';
 
     public static function getNavigationBadge(): ?string
     {
@@ -70,7 +73,7 @@ class PesertaResource extends Resource
                 Forms\Components\TextInput::make('nik')
                     ->label(__('NIK'))
                     ->validationAttribute('NIK')
-                    ->required()
+                    // ->required()
                     ->numeric()
                     ->minLength(16)
                     ->maxLength(16)
@@ -91,9 +94,14 @@ class PesertaResource extends Resource
                                 $fail('Tahun belum dipilih.');
                             }
 
+                            $idPeserta = $get('id'); // Ambil ID peserta jika sedang mengedit
+
                             // Periksa apakah ada peserta dengan NIK dan tahun_id yang sama
                             $pesertaExists = Peserta::where('nik', $value)
                                 ->where('tahun_id', $tahunId)
+                                ->when($idPeserta, function($query, $idPeserta) {
+                                    return $query->where('id', '!=', $idPeserta); // Abaikan peserta saat ini
+                                })
                                 ->exists();
 
                             if ($pesertaExists) {
@@ -150,14 +158,14 @@ class PesertaResource extends Resource
 
                 Forms\Components\TextInput::make('nama')
                     ->label(__('Nama Lengkap'))
-                    ->required()
+                    // ->required()
                     ->maxLength(255)
                     ->validationMessages([
                         'required' => 'Kolom Nama tidak boleh kosong',
                     ]),
                 Forms\Components\Select::make('jenis_kelamin')
                     ->label(__('Jenis Kelamin'))
-                    ->required()
+                    // ->required()
                     ->options([
                         'putra' => 'Laki-Laki',
                         'putri' => 'Perempuan',
@@ -172,14 +180,14 @@ class PesertaResource extends Resource
                     }),
                 Forms\Components\TextInput::make('tempat_lahir')
                     ->label(__('Tempat Lahir'))
-                    ->required()
+                    // ->required()
                     ->maxLength(50)
                     ->validationMessages([
                         'required' => 'Kolom Tempat Lahir tidak boleh kosong',
                     ]),
                 Forms\Components\DatePicker::make('tgl_lahir')
                     ->label(__('Tanggal Lahir'))
-                    ->required()
+                    // ->required()
                     ->native(false)
                     ->closeOnDateSelection()
                     ->displayFormat('d-m-Y')
@@ -193,21 +201,21 @@ class PesertaResource extends Resource
                     ]),
                 Forms\Components\Textarea::make('alamat_ktp')
                     ->label(__('Alamat KTP'))
-                    ->required()
+                    // ->required()
                     ->maxLength(500)
                     ->validationMessages([
                         'required' => 'Kolom Alamat KTP tidak boleh kosong',
                     ]),
                 Forms\Components\Textarea::make('alamat_domisili')
                     ->label(__('Alamat Domisili'))
-                    ->required()
+                    // ->required()
                     ->maxLength(500)
                     ->validationMessages([
                         'required' => 'Kolom Alamat KTP tidak boleh kosong',
                     ]),
                 Forms\Components\Select::make('utusan_id')
                     ->label(__('Utusan Kecamatan'))
-                    ->required()
+                    // ->required()
                     ->relationship('utusan', 'kecamatan')
                     ->native(false)
                     ->live() // Menambahkan live update
@@ -221,7 +229,7 @@ class PesertaResource extends Resource
                     ->label(__('Cabang yang Diikuti'))
                     ->preload()
                     ->relationship('cabang', 'nama_cabang')
-                    ->required()
+                    // ->required()
                     ->live()
                     ->options(function (Get $get) {
                         $utusanId = $get('utusan_id');
@@ -288,7 +296,7 @@ class PesertaResource extends Resource
                     ]),
                 FileUpload::make('kk_ktp')
                     ->label(__('Foto KK / KTP'))
-                    ->required()
+                    // ->required()
                     ->openable()
                     ->image()
                     ->maxSize(512)
@@ -299,7 +307,7 @@ class PesertaResource extends Resource
                     ->moveFiles(),
                 FileUpload::make('pasfoto')
                     ->label(__('Pas Foto'))
-                    ->required()
+                    // ->required()
                     ->image()
                     ->openable()
                     ->maxSize(512)
@@ -317,6 +325,13 @@ class PesertaResource extends Resource
                         $tahun = Tahun::where('is_active', true)->first();
                         return $tahun ? $tahun->id : null;
                     }),
+                // TextInput::make('grup_id')
+                //    ->default(function (Get $get ) {
+                //         if($get('cabang_id') == 19 || $get('cabang_id') == 20){
+                //             $grup = Grup::where('tahun_id', $get('tahun_id'))->where('utusan_id', $get('utusan_id'))->where('jenis_kelamin', $get('jenis_kelamin'))->first();
+                //             return $grup ? $grup->id : null;
+                //         }
+                //     })
             ])
             ->columns(1);
     }
@@ -325,10 +340,15 @@ class PesertaResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('index')
-                    ->label('No')
-                    ->rowIndex()
-                    ->toggleable(),
+                // TextColumn::make('index')
+                //     ->label('No')
+                //     ->rowIndex()
+                //     ->toggleable(),
+                TextInputColumn::make('no_peserta')
+                    ->label(__('NoPes'))
+                    ->searchable()
+                    ->toggleable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('nik')
                     ->label(__('NIK'))
                     ->searchable()
@@ -472,16 +492,30 @@ class PesertaResource extends Resource
                                     ->send();
                             }
                             if (in_array($record->cabang_id, [19, 20])) {
-                                // Tambahkan data baru di tabel nilai_tartils
-                                \App\Models\NilaiMfq::create([
-                                    'peserta_id' => $record->id,
-                                ]);
-                                Notification::make()
-                                    ->title('Verifikasi Berhasil')
-                                    ->body('Peserta ' . $record->nama . ' berhasil diverifikasi')
-                                    ->success()
-                                    ->send();
+                                // Cek apakah data dengan grup_id ini sudah ada di tabel nilai_mfq
+                                $nilaiMfqExists = \App\Models\NilaiMfq::where('grup_id', $record->grup_id)->exists();
+
+                                if (!$nilaiMfqExists) {
+                                    // Jika belum ada, buat data baru
+                                    \App\Models\NilaiMfq::create([
+                                        'grup_id' => $record->grup_id,
+                                    ]);
+
+                                    Notification::make()
+                                        ->title('Verifikasi Berhasil')
+                                        ->body('Peserta ' . $record->nama . ' berhasil diverifikasi')
+                                        ->success()
+                                        ->send();
+                                } else {
+                                    // Jika sudah ada, tampilkan notifikasi tanpa membuat data baru
+                                    Notification::make()
+                                        ->title('Verifikasi Berhasil')
+                                        ->body('Peserta ' . $record->nama . ' berhasil diverifikasi')
+                                        ->success()
+                                        ->send();
+                                }
                             }
+
                             if (in_array($record->cabang_id, [21, 22])) {
                                 // Tambahkan data baru di tabel nilai_tartils
                                 \App\Models\NilaiMsq::create([
@@ -559,7 +593,8 @@ class PesertaResource extends Resource
                             $nilaiSepuluhJuz = \App\Models\NilaiSepuluhJuz::where('peserta_id', $record->id)->first();
                             $nilaiDuapuluhJuz = \App\Models\NilaiDuapuluhJuz::where('peserta_id', $record->id)->first();
                             $nilaiTigapuluhJuz = \App\Models\NilaiTigapuluhJuz::where('peserta_id', $record->id)->first();
-                            $nilaiMfq = \App\Models\NilaiMfq::where('peserta_id', $record->id)->first();
+                            $nilaiMfq = \App\Models\NilaiMfq::where('grup_id', $record->grup_id)->first();
+                            $nilaiMfqExists = \App\Models\NilaiMfq::where('grup_id', $record->grup_id)->exists();
                             $nilaiMsq = \App\Models\NilaiMsq::where('peserta_id', $record->id)->first();
                             $nilaiNaskah = \App\Models\NilaiNaskah::where('peserta_id', $record->id)->first();
                             $nilaiMushaf = \App\Models\NilaiMushaf::where('peserta_id', $record->id)->first();
@@ -594,7 +629,10 @@ class PesertaResource extends Resource
                             } elseif ($nilaiTigapuluhJuz && ($nilaiTigapuluhJuz->total === null || $nilaiTigapuluhJuz->total == 0)) {
                                 // Hapus data jika memenuhi syarat
                                 $nilaiTigapuluhJuz->delete();
-                            } elseif ($nilaiMfq && ($nilaiMfq->total === null || $nilaiMfq->total == 0)) {
+                            } elseif (!$nilaiMfqExists) {
+                                // $record->update([$name => $isVerified]);
+                            }
+                            elseif ($nilaiMfq && ($nilaiMfq->total === null || $nilaiMfq->total == 0)) {
                                 // Hapus data jika memenuhi syarat
                                 $nilaiMfq->delete();
                             } elseif ($nilaiMsq && ($nilaiMsq->total === null || $nilaiMsq->total == 0)) {
@@ -635,7 +673,8 @@ class PesertaResource extends Resource
                         $record->update([$name => $isVerified]);
                     })
                     ->toggleable(),
-                Tables\Columns\TextColumn::make('tahun.tahun')
+                Tables\Columns\ImageColumn::make('pasfoto'),
+                Tables\Columns\ImageColumn::make('kk_ktp'),
             ])
             ->filters([
                 SelectFilter::make('utusan.kecamatan')

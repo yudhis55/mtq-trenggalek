@@ -10,6 +10,7 @@ use Filament\Tables\Table;
 use App\Models\NilaiTartil;
 use Filament\Resources\Resource;
 use Illuminate\Support\HtmlString;
+use Filament\Tables\Actions\Action;
 use Filament\Forms\Components\Split;
 use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Select;
@@ -165,6 +166,11 @@ class NilaiTartilResource extends Resource
                 //             'index',
                 //         ]),
                 //     ])
+                // Tombol untuk mengarahkan ke rute 'nilai-tartil.index'
+                Action::make('viewNilaiTartil')
+                    ->label('Penilaian Tartil')
+                    ->url(route('nilai-tartil.index'))
+                    ->icon('heroicon-o-eye'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make()

@@ -37,15 +37,23 @@ class NilaiMfqResource extends Resource
     {
         return $form
             ->schema([
-                //
-            ]);
+                TextInput::make('total')
+                    ->numeric(),
+            ])
+            ->columns(1);
     }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                //
+                TextColumn::make('index')
+                    ->label('No')
+                    ->rowIndex(),
+                TextColumn::make('grup.nama')
+                    ->label('Grup')
+                    ->searchable(),
+                TextColumn::make('total'),
             ])
             ->filters([
                 SelectFilter::make('peserta.jenis_kelamin')

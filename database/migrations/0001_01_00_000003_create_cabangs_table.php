@@ -18,10 +18,11 @@ return new class extends Migration
             $table->string('batas_umur');
             $table->date('per_tanggal');
             $table->integer('kuota');
-            $table->foreignId('tahun_id')->constrained(
-                table: 'tahuns',
-                indexName: 'cabangs_tahun_id'
-            );
+            $table->time('timer')->nullable();
+            // $table->foreignId('tahun_id')->nullable()->constrained(
+            //     table: 'tahuns',
+            //     indexName: 'cabangs_tahun_id'
+            // );
             $table->timestamps();
         });
     }

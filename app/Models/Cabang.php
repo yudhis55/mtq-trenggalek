@@ -17,10 +17,10 @@ class Cabang extends Model
         return $this->hasMany(Peserta::class);
     }
 
-    public function tahun(): BelongsTo
-    {
-        return $this->belongsTo(Tahun::class);
-    }
+    // public function tahun(): BelongsTo
+    // {
+    //     return $this->belongsTo(Tahun::class);
+    // }
 
     protected $dates = ['per_tanggal'];
 

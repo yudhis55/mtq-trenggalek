@@ -29,8 +29,13 @@ class Tahun extends Model
         return $this->hasMany(Peserta::class);
     }
 
-    public function cabang(): HasMany
+    // public function cabang(): HasMany
+    // {
+    //     return $this->hasMany(Cabang::class);
+    // }
+
+    public function grup(): HasMany
     {
-        return $this->hasMany(Cabang::class);
+        return $this->hasMany(Grup::class);
     }
 }

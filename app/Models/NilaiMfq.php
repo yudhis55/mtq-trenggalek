@@ -10,8 +10,8 @@ class NilaiMfq extends Model
 {
     use HasFactory;
 
-    public function peserta(): BelongsTo
+    public function grup(): BelongsTo
     {
-        return $this->belongsTo(Peserta::class);
+        return $this->belongsTo(Grup::class);
     }
 }

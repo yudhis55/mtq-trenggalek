@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('nilai_mfqs', function (Blueprint $table) {
             $table->id();
             $table->float('total')->nullable();
-            $table->foreignId('peserta_id')->constrained(
-                table: 'pesertas',
-                indexName: 'mfq_peserta_id'
+            $table->foreignId('grup_id')->constrained(
+                table: 'grups',
+                indexName: 'mfqs_grup_id'
             );
             $table->timestamps();
         });

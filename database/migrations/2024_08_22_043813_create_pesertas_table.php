@@ -13,13 +13,14 @@ return new class extends Migration
     {
         Schema::create('pesertas', function (Blueprint $table) {
             $table->id();
+            $table->char('no_peserta')->nullable();
             $table->string('nama');
             $table->string('jenis_kelamin');
             $table->string('nik');
             $table->string('tempat_lahir');
             $table->date('tgl_lahir');
             $table->string('alamat_ktp');
-            $table->string('alamat_domisili');
+            $table->string('alamat_domisili')->nullable();
             $table->foreignId('utusan_id')->constrained(
                 table: 'utusans',
                 indexName: 'pesertas_utusan_id'
@@ -28,20 +29,25 @@ return new class extends Migration
                 table: 'cabangs',
                 indexName: 'pesertas_cabang_id'
             )->cascadeOnDelete();
-            $table->string('kk_ktp');
+            $table->string('kk_ktp')->nullable();
             // $table->string('akta');
             // $table->string('ijazah');
             // $table->string('piagam');
-            $table->string('pasfoto');
+            $table->string('pasfoto')->nullable();
             $table->boolean('is_verified')->default(false);
-            $table->foreignId('user_id')->constrained(
+            $table->foreignId('user_id')->nullable()->constrained(
                 table: 'users',
                 indexName: 'pesertas_user_id'
             );
-            $table->foreignId('tahun_id')->constrained(
+            $table->foreignId('tahun_id')->nullable()->constrained(
                 table: 'tahuns',
                 indexName: 'pesertas_tahun_id'
             );
+            $table->foreignId('grup_id')->nullable()->constrained(
+                table: 'grups',
+                indexName: 'pesertas_grup_id'
+            );
+            $table->string('token', 64)->unique()->nullable();
             $table->timestamps();
         });
     }

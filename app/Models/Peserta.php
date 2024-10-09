@@ -2,17 +2,24 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 
 class Peserta extends Model
 {
     use HasFactory;
 
+    protected static function booted()
+    {
+        static::creating(function ($peserta) {
+            $peserta->token = Str::random(64);  // Generate token acak
+        });
+    }
     protected $casts = [
         'tgl_lahir' => 'date',
     ];
@@ -110,5 +117,10 @@ class Peserta extends Model
     public function nilainaskah(): HasOne
     {
         return $this->hasOne(NilaiNaskah::class);
+    }
+
+    public function grup(): BelongsTo
+    {
+        return $this->belongsTo(Grup::class);
     }
 }

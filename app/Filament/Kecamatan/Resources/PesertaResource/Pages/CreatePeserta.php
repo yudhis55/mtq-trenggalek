@@ -2,10 +2,11 @@
 
 namespace App\Filament\Kecamatan\Resources\PesertaResource\Pages;
 
-use App\Filament\Kecamatan\Resources\PesertaResource;
+use App\Models\Grup;
 use Filament\Actions;
-use Filament\Resources\Pages\CreateRecord;
 use Filament\Notifications\Notification;
+use Filament\Resources\Pages\CreateRecord;
+use App\Filament\Kecamatan\Resources\PesertaResource;
 
 class CreatePeserta extends CreateRecord
 {
@@ -25,4 +26,18 @@ class CreatePeserta extends CreateRecord
     {
         return $this->getResource()::getUrl('index');
     }
+
+    protected function afterCreate(): void
+    {
+        $cabangId = $this->record->cabang_id;
+        $tahunId = $this->record->tahun_id;
+        $utusanId = $this->record->utusan_id;
+
+        if($cabangId == 19 || $cabangId == 20){
+            $grup = Grup::where('tahun_id', $tahunId)->where('utusan_id', $utusanId)->first();
+            $this->record->grup_id = $grup->id;
+            $this->record->save();
+        }
+    }
+
 }

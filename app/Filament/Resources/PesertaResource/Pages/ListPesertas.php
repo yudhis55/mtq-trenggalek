@@ -25,6 +25,10 @@ class ListPesertas extends ListRecords
             // ExportAction::make('export')
             //     ->label(__('Download Excel'))
             //     ->color('success'),
+            \EightyNine\ExcelImport\ExcelImportAction::make()
+                ->color("info")
+                ->label(__('Import Excel'))
+                ->icon('heroicon-o-arrow-up-tray'),
         ];
     }
 }

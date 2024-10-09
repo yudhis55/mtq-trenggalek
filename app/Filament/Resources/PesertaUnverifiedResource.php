@@ -27,7 +27,7 @@ class PesertaUnverifiedResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-x-circle';
 
-    protected static ?string $navigationGroup = 'Manajemen Peserta';
+    protected static ?string $navigationGroup = 'Pendaftaran Peserta';
 
     public static function getNavigationBadge(): ?string
     {

@@ -2,20 +2,22 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\TahunResource\Pages;
-use App\Filament\Resources\TahunResource\RelationManagers;
-use App\Models\Tahun;
 use Filament\Forms;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
+use App\Models\Grup;
 use Filament\Tables;
-use Filament\Tables\Columns\TextColumn;
+use App\Models\Tahun;
+use App\Models\Peserta;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Resources\Resource;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Columns\ToggleColumn;
+use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\TahunResource\Pages;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\TahunResource\RelationManagers;
 
 class TahunResource extends Resource
 {
@@ -73,10 +75,29 @@ class TahunResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make()
+                ->before(function ($record) {
+                        // Hapus peserta terkait (opsional, jika Anda ingin menghapus peserta juga)
+                        Peserta::where('tahun_id', $record->id)->update(['grup_id' => null]);
+                        Peserta::where('tahun_id', $record->id)->update(['tahun_id' => null]);
+
+                        // Hapus grup terkait
+                        Grup::where('tahun_id', $record->id)->delete();
+                }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->before(function ($records) {
+                            foreach ($records as $record) {
+                                // Hapus peserta terkait (opsional, jika Anda ingin menghapus peserta juga)
+                                Peserta::where('tahun_id', $record->id)->update(['grup_id' => null]);
+                                Peserta::where('tahun_id', $record->id)->update(['tahun_id' => null]);
+
+                                // Hapus grup terkait
+                                Grup::where('tahun_id', $record->id)->delete();
+                            }
+                        }),
                 ]),
             ]);
     }

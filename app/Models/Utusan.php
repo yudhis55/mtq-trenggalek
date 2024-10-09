@@ -20,4 +20,9 @@ class Utusan extends Model
     {
         return $this->hasOne(User::class);
     }
+
+    public function grup(): HasMany
+    {
+        return $this->hasMany(Grup::class);
+    }
 }

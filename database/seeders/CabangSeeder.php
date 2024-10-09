@@ -19,7 +19,7 @@ class CabangSeeder extends Seeder
             'batas_umur' => '10 tahun 11 bulan 29 hari',
             'per_tanggal' => '2024-07-01',
             'kuota' => 1,
-            'tahun_id' => 1,
+            // 'tahun_id' => 1,
         ]);
 
         Cabang::create([
@@ -28,7 +28,7 @@ class CabangSeeder extends Seeder
             'batas_umur' => '10 tahun 11 bulan 29 hari',
             'per_tanggal' => '2024-07-01',
             'kuota' => 1,
-            'tahun_id' => 1,
+            // 'tahun_id' => 1,
         ]);
 
         Cabang::create([
@@ -37,7 +37,7 @@ class CabangSeeder extends Seeder
             'batas_umur' => '12 tahun 11 bulan 29 hari',
             'per_tanggal' => '2024-07-01',
             'kuota' => 1,
-            'tahun_id' => 1,
+            // 'tahun_id' => 1,
         ]);
 
         Cabang::create([
@@ -46,7 +46,7 @@ class CabangSeeder extends Seeder
             'batas_umur' => '12 tahun 11 bulan 29 hari',
             'per_tanggal' => '2024-07-01',
             'kuota' => 1,
-            'tahun_id' => 1,
+            // 'tahun_id' => 1,
         ]);
 
         Cabang::create([
@@ -55,7 +55,7 @@ class CabangSeeder extends Seeder
             'batas_umur' => '22 tahun 11 bulan 29 hari',
             'per_tanggal' => '2024-07-01',
             'kuota' => 1,
-            'tahun_id' => 1,
+            // 'tahun_id' => 1,
         ]);
 
         Cabang::create([
@@ -64,7 +64,7 @@ class CabangSeeder extends Seeder
             'batas_umur' => '22 tahun 11 bulan 29 hari',
             'per_tanggal' => '2024-07-01',
             'kuota' => 1,
-            'tahun_id' => 1,
+            // 'tahun_id' => 1,
         ]);
 
         Cabang::create([
@@ -73,7 +73,7 @@ class CabangSeeder extends Seeder
             'batas_umur' => '38 tahun 11 bulan 29 hari',
             'per_tanggal' => '2024-07-01',
             'kuota' => 1,
-            'tahun_id' => 1,
+            // 'tahun_id' => 1,
         ]);
 
         Cabang::create([
@@ -82,7 +82,7 @@ class CabangSeeder extends Seeder
             'batas_umur' => '38 tahun 11 bulan 29 hari',
             'per_tanggal' => '2024-07-01',
             'kuota' => 1,
-            'tahun_id' => 1,
+            // 'tahun_id' => 1,
         ]);
 
         Cabang::create([
@@ -91,7 +91,7 @@ class CabangSeeder extends Seeder
             'batas_umur' => '13 tahun 11 bulan 29 hari',
             'per_tanggal' => '2024-07-01',
             'kuota' => 1,
-            'tahun_id' => 1,
+            // 'tahun_id' => 1,
         ]);
 
         Cabang::create([
@@ -100,7 +100,7 @@ class CabangSeeder extends Seeder
             'batas_umur' => '13 tahun 11 bulan 29 hari',
             'per_tanggal' => '2024-07-01',
             'kuota' => 1,
-            'tahun_id' => 1,
+            // 'tahun_id' => 1,
         ]);
 
         Cabang::create([
@@ -109,7 +109,7 @@ class CabangSeeder extends Seeder
             'batas_umur' => '18 tahun 11 bulan 29 hari',
             'per_tanggal' => '2024-07-01',
             'kuota' => 1,
-            'tahun_id' => 1,
+            // 'tahun_id' => 1,
         ]);
 
         Cabang::create([
@@ -118,7 +118,7 @@ class CabangSeeder extends Seeder
             'batas_umur' => '18 tahun 11 bulan 29 hari',
             'per_tanggal' => '2024-07-01',
             'kuota' => 1,
-            'tahun_id' => 1,
+            // 'tahun_id' => 1,
         ]);
 
         Cabang::create([
@@ -127,7 +127,7 @@ class CabangSeeder extends Seeder
             'batas_umur' => '20 tahun 11 bulan 29 hari',
             'per_tanggal' => '2024-07-01',
             'kuota' => 1,
-            'tahun_id' => 1,
+            // 'tahun_id' => 1,
         ]);
 
         Cabang::create([
@@ -136,7 +136,7 @@ class CabangSeeder extends Seeder
             'batas_umur' => '20 tahun 11 bulan 29 hari',
             'per_tanggal' => '2024-07-01',
             'kuota' => 1,
-            'tahun_id' => 1,
+            // 'tahun_id' => 1,
         ]);
 
         Cabang::create([
@@ -145,7 +145,7 @@ class CabangSeeder extends Seeder
             'batas_umur' => '20 tahun 11 bulan 29 hari',
             'per_tanggal' => '2024-07-01',
             'kuota' => 1,
-            'tahun_id' => 1,
+            // 'tahun_id' => 1,
         ]);
 
         Cabang::create([
@@ -154,7 +154,7 @@ class CabangSeeder extends Seeder
             'batas_umur' => '20 tahun 11 bulan 29 hari',
             'per_tanggal' => '2024-07-01',
             'kuota' => 1,
-            'tahun_id' => 1,
+            // 'tahun_id' => 1,
         ]);
 
         Cabang::create([
@@ -163,7 +163,7 @@ class CabangSeeder extends Seeder
             'batas_umur' => '20 tahun 11 bulan 29 hari',
             'per_tanggal' => '2024-07-01',
             'kuota' => 1,
-            'tahun_id' => 1,
+            // 'tahun_id' => 1,
         ]);
 
         Cabang::create([
@@ -172,7 +172,7 @@ class CabangSeeder extends Seeder
             'batas_umur' => '20 tahun 11 bulan 29 hari',
             'per_tanggal' => '2024-07-01',
             'kuota' => 1,
-            'tahun_id' => 1,
+            // 'tahun_id' => 1,
         ]);
 
         Cabang::create([
@@ -181,7 +181,7 @@ class CabangSeeder extends Seeder
             'batas_umur' => '16 tahun 11 bulan 29 hari',
             'per_tanggal' => '2024-07-01',
             'kuota' => 3,
-            'tahun_id' => 1,
+            // 'tahun_id' => 1,
         ]);
 
         Cabang::create([
@@ -190,7 +190,7 @@ class CabangSeeder extends Seeder
             'batas_umur' => '16 tahun 11 bulan 29 hari',
             'per_tanggal' => '2024-07-01',
             'kuota' => 3,
-            'tahun_id' => 1,
+            // 'tahun_id' => 1,
         ]);
 
         Cabang::create([
@@ -199,7 +199,7 @@ class CabangSeeder extends Seeder
             'batas_umur' => '16 tahun 11 bulan 29 hari',
             'per_tanggal' => '2024-07-01',
             'kuota' => 3,
-            'tahun_id' => 1,
+            // 'tahun_id' => 1,
         ]);
 
         Cabang::create([
@@ -208,7 +208,7 @@ class CabangSeeder extends Seeder
             'batas_umur' => '16 tahun 11 bulan 29 hari',
             'per_tanggal' => '2024-07-01',
             'kuota' => 3,
-            'tahun_id' => 1,
+            // 'tahun_id' => 1,
         ]);
 
         Cabang::create([
@@ -217,7 +217,7 @@ class CabangSeeder extends Seeder
             'batas_umur' => '33 tahun 11 bulan 29 hari',
             'per_tanggal' => '2024-07-01',
             'kuota' => 1,
-            'tahun_id' => 1,
+            // 'tahun_id' => 1,
         ]);
 
         Cabang::create([
@@ -226,7 +226,7 @@ class CabangSeeder extends Seeder
             'batas_umur' => '33 tahun 11 bulan 29 hari',
             'per_tanggal' => '2024-07-01',
             'kuota' => 1,
-            'tahun_id' => 1,
+            // 'tahun_id' => 1,
         ]);
 
         Cabang::create([
@@ -235,7 +235,7 @@ class CabangSeeder extends Seeder
             'batas_umur' => '33 tahun 11 bulan 29 hari',
             'per_tanggal' => '2024-07-01',
             'kuota' => 1,
-            'tahun_id' => 1,
+            // 'tahun_id' => 1,
         ]);
 
         Cabang::create([
@@ -244,7 +244,7 @@ class CabangSeeder extends Seeder
             'batas_umur' => '33 tahun 11 bulan 29 hari',
             'per_tanggal' => '2024-07-01',
             'kuota' => 1,
-            'tahun_id' => 1,
+            // 'tahun_id' => 1,
         ]);
 
         Cabang::create([
@@ -253,7 +253,7 @@ class CabangSeeder extends Seeder
             'batas_umur' => '33 tahun 11 bulan 29 hari',
             'per_tanggal' => '2024-07-01',
             'kuota' => 1,
-            'tahun_id' => 1,
+            // 'tahun_id' => 1,
         ]);
 
         Cabang::create([
@@ -262,7 +262,7 @@ class CabangSeeder extends Seeder
             'batas_umur' => '33 tahun 11 bulan 29 hari',
             'per_tanggal' => '2024-07-01',
             'kuota' => 1,
-            'tahun_id' => 1,
+            // 'tahun_id' => 1,
         ]);
 
         Cabang::create([
@@ -271,7 +271,7 @@ class CabangSeeder extends Seeder
             'batas_umur' => '33 tahun 11 bulan 29 hari',
             'per_tanggal' => '2024-07-01',
             'kuota' => 1,
-            'tahun_id' => 1,
+            // 'tahun_id' => 1,
         ]);
 
         Cabang::create([
@@ -280,7 +280,7 @@ class CabangSeeder extends Seeder
             'batas_umur' => '33 tahun 11 bulan 29 hari',
             'per_tanggal' => '2024-07-01',
             'kuota' => 1,
-            'tahun_id' => 1,
+            // 'tahun_id' => 1,
         ]);
 
         Cabang::create([
@@ -289,7 +289,7 @@ class CabangSeeder extends Seeder
             'batas_umur' => '22 tahun 11 bulan 29 hari',
             'per_tanggal' => '2024-07-01',
             'kuota' => 1,
-            'tahun_id' => 1,
+            // 'tahun_id' => 1,
         ]);
 
         Cabang::create([
@@ -298,7 +298,7 @@ class CabangSeeder extends Seeder
             'batas_umur' => '22 tahun 11 bulan 29 hari',
             'per_tanggal' => '2024-07-01',
             'kuota' => 1,
-            'tahun_id' => 1,
+            // 'tahun_id' => 1,
         ]);
     }
 }
