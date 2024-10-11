@@ -131,6 +131,7 @@ class NilaiDuapuluhJuzResource extends Resource
                 TextColumn::make('fashahah'),
                 TextColumn::make('total'),
             ])
+            ->paginated(false)
             ->defaultSort('final_bobot', 'desc')
             ->filters([
                 SelectFilter::make('peserta.jenis_kelamin')

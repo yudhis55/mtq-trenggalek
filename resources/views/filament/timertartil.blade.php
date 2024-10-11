@@ -5,7 +5,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="refresh" content="30">
     <title>MTQ KABUPATEN TRENGGALEK 2024</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tiny-slider/2.9.4/tiny-slider.css">
@@ -192,146 +191,122 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    // Ambil elemen yang diperlukan dari DOM
-    let timerDisplay = document.getElementById('timer');
-    let startBtn = document.getElementById('startBtn');
-    let pauseBtn = document.getElementById('pauseBtn');
-    let restartBtn = document.getElementById('restartBtn');
+    <script>
+        // Ambil elemen yang diperlukan dari DOM
+        let timerDisplay = document.getElementById('timer');
+        let startBtn = document.getElementById('startBtn');
+        let pauseBtn = document.getElementById('pauseBtn');
+        let restartBtn = document.getElementById('restartBtn');
 
-    // Mengambil waktu tersisa dari localStorage atau atur ke 60
-    let timeLeft = localStorage.getItem('timeLeft') ? parseInt(localStorage.getItem('timeLeft')) : 60;
-    let countdown;
+        // Mengambil waktu tersisa dari localStorage atau atur ke 60
+        let timeLeft = localStorage.getItem('timeLeft') ? parseInt(localStorage.getItem('timeLeft')) : 60;
+        let countdown;
 
-    // Variabel untuk menandakan apakah timer sedang berjalan
-    let isRunning = false;
+        // Variabel untuk menandakan apakah timer sedang berjalan
+        let isRunning = false;
 
-    // File audio yang akan diputar
-    const startSound = new Audio('/sounds/start.mp3');
-    const sound30Seconds = new Audio('/sounds/30seconds.mp3');
-    const sound15Seconds = new Audio('/sounds/15seconds.mp3');
-    const timeUpSound = new Audio('/sounds/timesup.mp3');
+        // Inisialisasi Doughnut Chart untuk Timer
+        let ctx = document.getElementById('timerChart').getContext('2d');
+        let timerChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: [timeLeft, 60 - timeLeft], // [Time Left, Time Elapsed]
+                    backgroundColor: ['#3498db', '#e0e0e0'], // Blue and grey colors
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                cutout: '80%',
+                rotation: -90, // Mulai dari atas
+                circumference: 360, // Lingkaran penuh
+                responsive: false
+            }
+        });
 
-    // Inisialisasi Doughnut Chart untuk Timer
-    let ctx = document.getElementById('timerChart').getContext('2d');
-    let timerChart = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            datasets: [{
-                data: [timeLeft, 60 - timeLeft], // [Time Left, Time Elapsed]
-                backgroundColor: ['#3498db', '#e0e0e0'], // Blue and grey colors
-                borderWidth: 0
-            }]
-        },
-        options: {
-            cutout: '80%',
-            rotation: -90, // Mulai dari atas
-            circumference: 360, // Lingkaran penuh
-            responsive: false
-        }
-    });
+        // Fungsi untuk memperbarui tampilan timer
+        function updateTimerDisplay() {
+            timerDisplay.textContent = timeLeft;
+            timerChart.data.datasets[0].data = [timeLeft, 60 - timeLeft];
+            timerChart.update();
 
-    // Fungsi untuk memperbarui tampilan timer
-    function updateTimerDisplay() {
-        timerDisplay.textContent = timeLeft;
-        timerChart.data.datasets[0].data = [timeLeft, 60 - timeLeft];
-        timerChart.update();
-
-        // Ubah warna latar belakang berdasarkan waktu yang tersisa
-        const timerContainer = document.getElementById('timer-container');
-        if (timeLeft <= 15) {
-            timerContainer.classList.remove('bg-yellow-500', 'bg-white');
-            timerContainer.classList.add('bg-red-500'); // Merah
-        } else if (timeLeft <= 30) {
-            timerContainer.classList.remove('bg-white', 'bg-red-500');
-            timerContainer.classList.add('bg-yellow-500'); // Kuning
-        } else {
-            timerContainer.classList.remove('bg-red-500', 'bg-yellow-500');
-            timerContainer.classList.add('bg-white'); // Putih
+            // Ubah warna latar belakang berdasarkan waktu yang tersisa
+            const timerContainer = document.getElementById('timer-container');
+            if (timeLeft <= 15) {
+                timerContainer.classList.remove('bg-yellow-500', 'bg-white');
+                timerContainer.classList.add('bg-red-500'); // Merah
+            } else if (timeLeft <= 30) {
+                timerContainer.classList.remove('bg-white', 'bg-red-500');
+                timerContainer.classList.add('bg-yellow-500'); // Kuning
+            } else {
+                timerContainer.classList.remove('bg-red-500', 'bg-yellow-500');
+                timerContainer.classList.add('bg-white'); // Putih
+            }
         }
 
-        // Cek jika waktu mencapai 30 detik atau 15 detik dan mainkan suara
-        playSoundBasedOnTime();
-    }
-
-    // Fungsi untuk memutar suara berdasarkan waktu yang tersisa
-    function playSoundBasedOnTime() {
-        if (timeLeft === 30) {
-            sound30Seconds.play(); // Mainkan suara pada 30 detik
+        // Fungsi untuk memulai timer
+        function startTimer() {
+            if (!isRunning) {
+                isRunning = true;
+                countdown = setInterval(function () {
+                    if (timeLeft > 0) {
+                        timeLeft--;
+                        localStorage.setItem('timeLeft', timeLeft); // Simpan ke localStorage
+                        updateTimerDisplay();
+                    } else {
+                        clearInterval(countdown);
+                        isRunning = false;
+                        alert('Waktu habis!');
+                        localStorage.removeItem('timeLeft'); // Hapus waktu dari localStorage saat selesai
+                    }
+                }, 1000);
+            }
         }
-        if (timeLeft === 15) {
-            sound15Seconds.play(); // Mainkan suara pada 15 detik
-        }
-        if (timeLeft === 0) {
-            timeUpSound.play(); // Mainkan suara saat waktu habis
-        }
-    }
 
-    // Fungsi untuk memulai timer
-    function startTimer() {
-        if (!isRunning) {
-            startSound.play(); // Mainkan suara saat timer dimulai
-            isRunning = true;
-            countdown = setInterval(function () {
-                if (timeLeft > 0) {
-                    timeLeft--;
-                    localStorage.setItem('timeLeft', timeLeft); // Simpan ke localStorage
-                    updateTimerDisplay();
-                } else {
-                    clearInterval(countdown);
-                    isRunning = false;
-                    alert('Waktu habis!');
-                    localStorage.removeItem('timeLeft'); // Hapus waktu dari localStorage saat selesai
-                }
-            }, 1000);
+        // Fungsi untuk menghentikan sementara (pause) timer
+        function pauseTimer() {
+            clearInterval(countdown);
+            isRunning = false;
         }
-    }
 
-    // Fungsi untuk menghentikan sementara (pause) timer
-    function pauseTimer() {
-        clearInterval(countdown);
-        isRunning = false;
-    }
+        // Fungsi untuk mereset timer
+        function restartTimer() {
+            clearInterval(countdown);
+            timeLeft = 60; // Setel kembali ke 60 detik
+            localStorage.removeItem('timeLeft'); // Hapus dari localStorage
+            updateTimerDisplay();
+            isRunning = false;
+        }
 
-    // Fungsi untuk mereset timer
-    function restartTimer() {
-        clearInterval(countdown);
-        timeLeft = 60; // Setel kembali ke 60 detik
-        localStorage.removeItem('timeLeft'); // Hapus dari localStorage
+        // Event Listeners untuk tombol kontrol
+        startBtn.addEventListener('click', startTimer);
+        pauseBtn.addEventListener('click', pauseTimer);
+        restartBtn.addEventListener('click', restartTimer);
+
+        // Inisialisasi tampilan timer pertama kali
         updateTimerDisplay();
-        isRunning = false;
-    }
 
-    // Event Listeners untuk tombol kontrol
-    startBtn.addEventListener('click', startTimer);
-    pauseBtn.addEventListener('click', pauseTimer);
-    restartBtn.addEventListener('click', restartTimer);
+        // Menjalankan timer otomatis jika halaman di-refresh
+        if (localStorage.getItem('timeLeft') > 0) {
+            startTimer();
+        }
 
-    // Inisialisasi tampilan timer pertama kali
-    updateTimerDisplay();
-
-    // Menjalankan timer otomatis jika halaman di-refresh
-    if (localStorage.getItem('timeLeft') > 0) {
-        startTimer();
-    }
-
-    // Inisialisasi carousel
-    var slider = tns({
-        container: '.my-slider',
-        items: 2, // Number of items to show at once
-        slideBy: 1, // Slide one item at a time
-        autoplay: true, // Enable auto sliding
-        autoplayTimeout: 2000, // 2 seconds per slide
-        speed: 1500, // Slow down the sliding speed
-        autoplayButtonOutput: false, // Hide autoplay buttons
-        controls: false, // Hide controls
-        nav: false, // Hide navigation dots
-        mouseDrag: true, // Allow dragging with mouse or touch
-        gutter: 20, // Space between each item
-        loop: true // Infinite loop
-    });
-</script>
-
+        // Inisialisasi carousel
+        var slider = tns({
+            container: '.my-slider',
+            items: 2, // Number of items to show at once
+            slideBy: 1, // Slide one item at a time
+            autoplay: true, // Enable auto sliding
+            autoplayTimeout: 2000, // 2 seconds per slide
+            speed: 1500, // Slow down the sliding speed
+            autoplayButtonOutput: false, // Hide autoplay buttons
+            controls: false, // Hide controls
+            nav: false, // Hide navigation dots
+            mouseDrag: true, // Allow dragging with mouse or touch
+            gutter: 20, // Space between each item
+            loop: true // Infinite loop
+        });
+    </script>
 </body>
 
 </html>

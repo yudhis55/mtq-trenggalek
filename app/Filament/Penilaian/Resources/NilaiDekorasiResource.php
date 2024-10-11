@@ -131,6 +131,7 @@ class NilaiDekorasiResource extends Resource
                 TextColumn::make('keindahan_hiasan_dan_lukisan'),
                 TextColumn::make('total'),
             ])
+            ->paginated(false)
             ->defaultSort('final_bobot', 'desc')
             ->filters([
                 SelectFilter::make('peserta.jenis_kelamin')

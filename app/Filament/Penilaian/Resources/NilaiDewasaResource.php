@@ -159,6 +159,7 @@ class NilaiDewasaResource extends Resource
                 TextColumn::make('suara'),
                 TextColumn::make('total'),
             ])
+            ->paginated(false)
             ->defaultSort('final_bobot', 'desc')
             ->filters([
                 SelectFilter::make('peserta.jenis_kelamin')

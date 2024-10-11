@@ -53,6 +53,10 @@ class CabangResource extends Resource
                     ->native(false)
                     ->closeOnDateSelection()
                     ->displayFormat('d-m-Y'),
+                Forms\Components\TimePicker::make('timer')
+                    ->label(__('Durasi Lomba'))
+                    ->prefixIcon('heroicon-m-play')
+                    ->native(false)
             ]);
     }
 
@@ -69,6 +73,8 @@ class CabangResource extends Resource
                 Tables\Columns\TextColumn::make('per_tanggal')
                     ->date('d-m-Y'),
                 Tables\Columns\TextColumn::make('kuota'),
+                Tables\Columns\TextColumn::make('timer')
+                    ->label(__('Durasi Lomba')),
             ])
             ->filters([
                 //

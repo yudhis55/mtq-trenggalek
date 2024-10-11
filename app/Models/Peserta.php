@@ -18,6 +18,15 @@ class Peserta extends Model
     {
         static::creating(function ($peserta) {
             $peserta->token = Str::random(64);  // Generate token acak
+
+            if (is_null($peserta->pasfoto)) {
+                // Tentukan gambar default berdasarkan jenis_kelamin
+                if ($peserta->jenis_kelamin === 'putra') {
+                    $peserta->pasfoto = 'default/defaultpa.png'; // Ganti dengan path gambar default untuk putra
+                } elseif ($peserta->jenis_kelamin === 'putri') {
+                    $peserta->pasfoto = 'default/defaultpi.png'; // Ganti dengan path gambar default untuk putri
+                }
+            }
         });
     }
     protected $casts = [

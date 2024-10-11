@@ -42,6 +42,7 @@ class NilaiTartilResource extends Resource
                     Section::make([
                         TextInput::make('peserta_id')
                             // ->relationship('peserta', 'nama')
+                            ->label(__('Nama'))
                             ->live(onBlur: true)
                             ->disabled()
                             ->formatStateUsing(fn(NilaiTartil $record): string => $record->peserta->nama ?? ''),
@@ -111,6 +112,7 @@ class NilaiTartilResource extends Resource
                             ->reactive(),
                     ]),
                 ])
+                ->from('md')
             ])
             ->columns(1);
     }
@@ -133,6 +135,7 @@ class NilaiTartilResource extends Resource
                 TextColumn::make('fashahah'),
                 TextColumn::make('total'),
             ])
+            ->paginated(false)
             ->defaultSort('final_bobot', 'desc')
             ->filters([
                 SelectFilter::make('peserta.jenis_kelamin')
@@ -170,7 +173,8 @@ class NilaiTartilResource extends Resource
                 Action::make('viewNilaiTartil')
                     ->label('Penilaian Tartil')
                     ->url(route('nilai-tartil.index'))
-                    ->icon('heroicon-o-eye'),
+                    ->icon('heroicon-o-eye')
+                    ->openUrlInNewTab(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
@@ -184,7 +188,7 @@ class NilaiTartilResource extends Resource
                         $record->save();
                     })
                     ->modalHeading('Input Nilai')
-                    ->modalDescription('Pastikan input nilai sudah sesuai, karena tidak bisa diubah')
+                    ->modalDescription('Pastikan input nilai dengan tepat, karena kesempatan mengisi hanya sekali')
                     ->hidden(fn ($record): bool => $record->total != 0 && $record->total != null &&
                         $record->tajwid != 0 && $record->tajwid != null &&
                         $record->irama_dan_suara != 0 && $record->irama_dan_suara != null &&
